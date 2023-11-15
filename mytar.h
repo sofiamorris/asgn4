@@ -1,3 +1,5 @@
+#define PATH_MAX 256
+
 typedef struct __attribute__ ((__packed__)) header_t{
 	char name[101];
 	char mode[8];
@@ -15,8 +17,16 @@ typedef struct __attribute__ ((__packed__)) header_t{
 	char devmajor[8];
 	char devminor[8];
 	char prefix[155];
+	char padding[12];
 }header;
 
 typedef struct archive_t{
-
+	header h; 
+	/*some num of dataBlocks*/
 }archive;
+
+
+int main(int argc, char *argv[]);
+archive createArchive(char *path);
+void createTable(char *path, int file);
+extern int c = 0, t = 0, x = 0, v = 0; f = 0, S = 0;
