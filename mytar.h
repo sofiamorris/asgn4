@@ -1,4 +1,5 @@
 #define PATH_MAX 256
+#define BLOCK_SIZE 512
 
 typedef struct __attribute__ ((__packed__)) header_t{
 	char name[101];
