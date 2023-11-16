@@ -7,7 +7,6 @@
 int main(int argc, char *argv[]){
 	int i, file;
 	static int c = 0, t = 0, x = 0, v = 0; f = 0, S = 0;
-	archive arch;
 	char path[PATH_MAX];
 
 	/*read in options from argv[1]*/
@@ -60,7 +59,7 @@ int main(int argc, char *argv[]){
 	}
 	if(c){
 		if(argv[3]){
-			arch = createArchive(argv[3]);
+			createArchive(argv[3], file);
 		}
 		else{
 	        perror("No path provided");	
