@@ -1,3 +1,5 @@
+#include "mytar.h"
+
 void writeDir(char *path, int file){
     DIR *dir;
     struct dirent *ent;
