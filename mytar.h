@@ -1,5 +1,14 @@
 #define PATH_MAX 256
 #define BLOCK_SIZE 512
+#define OFF_NAME 0
+#define OFF_MODE 100
+#define OFF_UID 108
+#define OFF_GID 116
+#define OFF_SIZE 124
+#define OFF_MTIME 136
+#define OFF_CHKSUM 148
+#define OFF_TYPEFLAG 156
+#define OFF_PREFIX 345
 
 typedef struct __attribute__ ((__packed__)) header_t{
 	char name[101];
@@ -21,13 +30,11 @@ typedef struct __attribute__ ((__packed__)) header_t{
 	char padding[12];
 }header;
 
-typedef struct archive_t{
-	header h; 
-	/*some num of dataBlocks*/
-}archive;
-
 
 int main(int argc, char *argv[]);
-archive createArchive(char *path);
-void createTable(char *path, int file);
+void createArchive(char *path, int file);
+void createTable(char *pathNames, int file, int argc);
+void writeDir(char *path, int file);
+void writeFile(char *path, int file);
+void writeSym(char *path, int file);
 extern int c = 0, t = 0, x = 0, v = 0; f = 0, S = 0;
