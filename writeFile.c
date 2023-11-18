@@ -10,7 +10,7 @@ void writeFile(char *path, int file){
     header h;
 
     if ((fd = open(path, O_RDONLY, S_IRUSR)) == -1){
-        perror("file can't be read");
+        perror("file can't be opened");
         return;
     }
     /*get size of file for header*/
@@ -34,6 +34,10 @@ void writeFile(char *path, int file){
     }
     /*write dataBlock*/
     while ((bytesRead = read(fd, buffer, BLOCK_SIZE) > 0)){
+        if (bytesRead == -1){
+            perror("cannot read byte in file");
+            return;
+        }
         if (write(file, buffer, bytesRead) == -1){
             perror("cannot write file");
             close(fd);

@@ -3,23 +3,23 @@
 #include <stdint.h>
 #include "mytar.h"
 
-void createTable(char *path, int file){
-    header h;
+void createTable(char *pathNames, int file, int argc){
     u_int8_t i = 0, byte = 0, off;
     ssize_t bytesRead;
     char header[BLOCK_SIZE];
     char *endptr;
     char chksum[HD_CHKSUM];
-    char perm[HD_MODE], uid[HD_UID], gid[HD_GID];
+    char mode[HD_MODE], uid[HD_UID], gid[HD_GID];
     char size[HD_SIZE], mtime[HD_MTIME];
     char fullName[PATH_MAX];
     long intSize, intChksum;
     int nullBlocks = 0;
     int reachedPath = 0;
-    int pathIt, endIt = 0;
+    int pathIt;
     char pathEnd[PATH_MAX];
 
-    if(strcmp(path, "") == 0){
+    /*check if any paths were entered in command line*/
+    if(strcmp(pathNames, "") == 0){
         while(1){
             /*read bytes into header array*/
             while ((bytesRead = read(file, header, BLOCK_SIZE) > 0)){
@@ -68,7 +68,7 @@ void createTable(char *path, int file){
                 /*create string consisting of permissions,
                  owner/group, size, and Mtime using offsets*/
                 for(off = OFF_MODE; off < HD_MODE; off++){
-                    perm[byte] = header[off];
+                    mode[byte] = header[off];
                     byte++;
                 }
                 byte = 0;
@@ -93,7 +93,7 @@ void createTable(char *path, int file){
                 }
                 byte = 0;
                 printf("%s %s/%s %s %s %s %s\n",\
-                     perm, uid, gid, size, mtime, fullName);
+                     mode, uid, gid, size, mtime, fullName);
             }
             else{
                 /*read path name and print it*/
@@ -108,7 +108,6 @@ void createTable(char *path, int file){
             i = BLOCK_SIZE + (BLOCK_SIZE * (intSize / BLOCK_SIZE));
             lseek(file, i, SEEK_CUR);
         }
-
     }
     else{
         while(1){
@@ -154,21 +153,24 @@ void createTable(char *path, int file){
                 fullName[byte] = header[off];
                 byte++;
             }
-            /*check if path is reached*/
-            if (strcmp(fullName, path) == 0){
-                reachedPath = 1;
+            /*iterate through list of pathNames and check if path is reached*/
+            for(pathIt = 0; pathIt < argc; pathIt++){
+                if (strcmp(fullName, pathNames[pathIt]) == 0){
+                    reachedPath = 1;
+                    break;
+                }
             }
             /*if reachedPath, start printing directory and descendents*/
             if(reachedPath){
                 /*check if a descendent of directory, break if not*/
-                if(strstr(fullName, path) == NULL){
-                    break;
+                if(strstr(fullName, pathNames[pathIt]) == NULL){
+                    reachedPath = 0;
                 }
                 if (v){
                     /*create string consisting of permissions,
                     owner/group, size, and Mtime using offsets*/
                     for(off = OFF_MODE; off < HD_MODE; off++){
-                        perm[byte] = header[off];
+                        mode[byte] = header[off];
                         byte++;
                     }
                     byte = 0;
@@ -193,7 +195,7 @@ void createTable(char *path, int file){
                     }
                     byte = 0;
                     printf("%s %s/%s %s %s %s %s\n",\
-                         perm, uid, gid, size, mtime, fullName);
+                         mode, uid, gid, size, mtime, fullName);
                 }
                 else{
                     /*read path name and print it*/
