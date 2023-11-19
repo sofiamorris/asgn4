@@ -1,5 +1,18 @@
+#include <stdlib.h>
+
 #define PATH_MAX 256
 #define BLOCK_SIZE 512
+#define OFF_NAME 0
+#define OFF_MODE 100
+#define OFF_UID 108
+#define OFF_GID 116
+#define OFF_SIZE 124
+#define OFF_MTIME 136
+#define OFF_CHKSUM 148
+#define OFF_TYPEFLAG 156
+#define OFF_LINKNAME 157
+#define OFF_PREFIX 345
+#define ALLMODE 777
 
 typedef struct __attribute__ ((__packed__)) header_t{
 	char name[101];
@@ -21,11 +34,16 @@ typedef struct __attribute__ ((__packed__)) header_t{
 	char padding[12];
 }header;
 
-
 int main(int argc, char *argv[]);
 void createArchive(char *path, int file);
-void createTable(char *path, int file);
+void createTable(char *pathNames, int file, int argc);
 void writeDir(char *path, int file);
 void writeFile(char *path, int file);
-void writeSym(char *path, int file)
+void writeSym(char *path, int file);
+void createTable(char *pathNames, int file, int argc);
+void extractArchive(char *pathNames, int file, int argc);
+void extractFile(char *name,int blocks,mode_t perms,int file,time_t mtime);
+void extractDir(char *name, mode_t perms, time_t mtime);
+void extractSymLink(char *name, char *linkname, time_t mtime);
+struct header extractHeader(char *extractedHeader);
 extern int c = 0, t = 0, x = 0, v = 0; f = 0, S = 0;
