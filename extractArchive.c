@@ -13,6 +13,7 @@ void extractArchive(char *pathNames, int file){
     char size[HD_SIZE], mode[HD_MODE], uid[HD_UID], gid[HD_GID];
     char fullName[PATH_MAX];
     long intSize, intChksum, intMode, intMtime;
+    ssize_t bytesRead;
     int nullBlocks = 0;
     int reachedPath = 0;
     int pathIt, numBlocks;
@@ -74,7 +75,6 @@ void extractArchive(char *pathNames, int file){
                 byte++;
             }
             byte = 0;
-            printf("%s\n", fullName);
             /*get permissions*/
             for(off = OFF_MODE; off < HD_MODE; off++){
                 mode[byte] = header[off];
@@ -114,7 +114,7 @@ void extractArchive(char *pathNames, int file){
                 extractFile(fullName,numBlocks,perms,file,(time_t)intMtime);
             }
             /*if symlink, then create symlink*/
-            else{
+            else if (header[OFF_TYPEFLAG] == '2'){
                 /*get linkname from header*/
                 for(off = OFF_LINKNAME; off < HD_LINKNAME; off++){
                     linkname[byte] = header[off];
@@ -124,6 +124,9 @@ void extractArchive(char *pathNames, int file){
                 perms = perms & ~umask(0);
                 perms = perms | (mode & (ALLMODE));
                 extractSymLink(fullName, linkname, (time_t)intMtime);
+            }
+            else{
+                perror("file type unidentifiable");
             }
         }
     } 

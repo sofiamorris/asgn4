@@ -18,5 +18,6 @@ void extractDir(char *name, mode_t perms, time_t mtime){
         perror("error setting mtime");
         exit(EXIT_FAILURE);
     }
+    printf("%s\n", name);
     return;
 }
