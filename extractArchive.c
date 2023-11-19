@@ -2,22 +2,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <sys/stat.h>
+#include <utime.h>
 
 void extractArchive(char *pathNames, int file){
     u_int8_t i = 0, byte = 0, off;
-    ssize_t bytesRead;
     char header[BLOCK_SIZE];
-    char dataBlock[BLOCK_SIZE];
     char *endptr;
-    char chksum[HD_CHKSUM];
+    char chksum[HD_CHKSUM], mtime[HD_MTIME], linkname[HD_LINKNAME];
     char size[HD_SIZE], mode[HD_MODE], uid[HD_UID], gid[HD_GID];
     char fullName[PATH_MAX];
-    long intSize, intChksum, intMode, int;
+    long intSize, intChksum, intMode, intMtime;
     int nullBlocks = 0;
     int reachedPath = 0;
     int pathIt, numBlocks;
     char pathEnd[PATH_MAX];
-    int extractedFile;
+    mode_t perms = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
     
     if (strcmp(pathNames, "") == 0){
         while(1){
@@ -46,6 +46,7 @@ void extractArchive(char *pathNames, int file){
                     break;
                 }
             }
+            /*get size of dataBlock from header*/
             for(off = OFF_SIZE; off < HD_SIZE; off++){
                 size[byte] = header[off];
                 byte++;
@@ -55,67 +56,74 @@ void extractArchive(char *pathNames, int file){
                 perror("error converting size to int");
                 exit(EXIT_FAILURE);
             }
-            /*check type, if file then copy, else go to next header*/
-            if (header[OFF_TYPEFLAG] == '0' || header[OFF_TYPEFLAG] == '\0'){
-                /* fill fullName combining offsets of name and prefix*/
-                for(off = OFF_NAME; off < HD_NAME; off++){
-                    if(header[off] == '\0'){
-                        break;
-                    }
-                    fullName[byte] = header[off];
-                    byte++;
+            /* fill fullName combining offsets of name and prefix*/
+            for(off = OFF_NAME; off < HD_NAME; off++){
+            if(header[off] == '\0'){
+                break;
                 }
-                fullName[byte] = '/';
+                fullName[byte] = header[off];
                 byte++;
-                for(off = OFF_PREFIX; off < HD_PREFIX; off++){
-                    if(header[off] == '\0'){
-                        break;
-                    }
-                    fullName[byte] = header[off];
-                    byte++;
-                }
-                byte = 0;
-                printf("%s\n", fullName);
-                /*get permissions and owners*/
-                for(off = OFF_MODE; off < HD_MODE; off++){
-                    mode[byte] = header[off];
-                    byte++;
-                }
-                byte = 0;
-                intMode = strtol(mode, &endptr, 8);
-                if (*endptr != '\0'){
-                    perror("error converting size to int");
-                    exit(EXIT_FAILURE);
-                }
-               /* for(off = OFF_UID; off < HD_UID; off++){
-                    uid[byte] = header[off];
-                    byte++;
-                }
-                byte = 0;
-                for(off = OFF_GID; off < HD_GID; off++){
-                    gid[byte] = header[off];
-                    byte++;
-                }*/
-                /*open new file and give same attributes as archived file*/
-                if ((extractedFile = open(fullName, /*permissions, owners*/, intMode)) == -1){
-                    perror("unable to create new file");
-                    exit(EXIT_FAILURE);
-                }
-                numBlocks = intSize / BLOCK_SIZE;
-                while ((bytesRead = read(file, dataBlock, BLOCK_SIZE) > 0)){
-                    if (bytesRead == -1){
-                            perror("cannot read file");
-                            exit(EXIT_FAILURE);
-                    }
-                    if (write(extractedFile, dataBlock, bytesRead) == -1){
-                        perror("cannot write to extracted file");
-                        return;
-                    }
-                }
             }
+            fullName[byte] = '/';
+            byte++;
+            for(off = OFF_PREFIX; off < HD_PREFIX; off++){
+                if(header[off] == '\0'){
+                    break;
+                }
+                fullName[byte] = header[off];
+                byte++;
+            }
+            byte = 0;
+            printf("%s\n", fullName);
+            /*get permissions*/
+            for(off = OFF_MODE; off < HD_MODE; off++){
+                mode[byte] = header[off];
+                byte++;
+            }
+            intMode = strtol(mode, &endptr, 8);
+            if (*endptr != '\0'){
+                perror("error converting size to int");
+                exit(EXIT_FAILURE);
+            }
+            /*get modification time*/
+            for(off = OFF_MTIME; off < HD_MTIME; off++){
+                mtime[byte] = header[off];
+                byte++;
+            }
+            byte = 0;
+            intMtime = strtol(mtime, &endptr, 8);
+            if (*endptr != '\0'){
+                perror("error converting size to int");
+                exit(EXIT_FAILURE);
+            }
+            /*check type, if directory, then create directory*/
+            if (header[OFF_TYPEFLAG] == '5'){
+                perms = perms | (S_IXUSR | S_IXGRP | S_IXOTH);
+                perms = perms & ~umask(0);
+                perms = perms | (mode & (ALLMODE));
+                extractDir(fullName, perms, (time_t)intMtime);
+            }
+            /*if file, then create file*/
+            else if (header[OFF_TYPEFLAG]=='0' || header[OFF_TYPEFLAG]=='\0'){
+                if (intMode & (S_IXUSR | S_IXGRP | S_IXOTH)) {
+                    perms = perms | (S_IXUSR | S_IXGRP | S_IXOTH);
+                }
+                perms = perms & ~umask(0);
+                perms = perms | (mode & (ALLMODE));
+                numBlocks = intSize / BLOCK_SIZE;
+                extractFile(fullName,numBlocks,perms,file,(time_t)intMtime);
+            }
+            /*if symlink, then create symlink*/
             else{
-                i = BLOCK_SIZE + (BLOCK_SIZE * (intSize / BLOCK_SIZE));
-                lseek(file, i, SEEK_CUR);
+                /*get linkname from header*/
+                for(off = OFF_LINKNAME; off < HD_LINKNAME; off++){
+                    linkname[byte] = header[off];
+                    byte++;
+                }
+                byte = 0;
+                perms = perms & ~umask(0);
+                perms = perms | (mode & (ALLMODE));
+                extractSymLink(fullName, linkname, (time_t)intMtime);
             }
         }
     } 

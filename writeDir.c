@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #include "mytar.h"
 
 void writeDir(char *path, int file){
@@ -12,7 +15,7 @@ void writeDir(char *path, int file){
     if (write(file, h, BLOCK_SIZE)){
         perror("cannot write header");
     }
-    if(dir = opendir(path) == NULL){
+    if((dir = opendir(path)) == NULL){
         perror("can't open directory");
     }
     else{
@@ -40,5 +43,5 @@ void writeDir(char *path, int file){
             }
         }
     }
-    close(dir);
+    closedir(dir);
 }
