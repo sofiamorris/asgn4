@@ -1,6 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <string.h>
+#include <stdint.h>
+#include <sys/stat.h>
+#include <utime.h>
+#include <sys/fcntl.h>
+#include <unistd.h>
+#include <dirent.h>
+
 
 #ifndef PATH_MAX
 #define PATH_MAX 256
@@ -36,7 +44,14 @@
 #define OFF_CHKSUM 148
 #define OFF_TYPEFLAG 156
 #define OFF_LINKNAME 157
+#define OFF_MAGIC 257
+#define OFF_VERSION 263
+#define OFF_UNAME 265
+#define OFF_GNAME 297
+#define OFF_DEVMAJOR 329
+#define OFF_DEVMINOR 337
 #define OFF_PREFIX 345
+
 #define ALLMODE 777
 
 typedef struct __attribute__ ((__packed__)) header_st{
@@ -70,5 +85,7 @@ void extractArchive(char *pathNames, int file, int argc);
 void extractFile(char *name,int blocks,mode_t perms,int file,time_t mtime);
 void extractDir(char *name, mode_t perms, time_t mtime);
 void extractSymLink(char *name, char *linkname, time_t mtime);
-struct header extractHeader(char *extractedHeader);
+header makeHeader(char name[], struct stat fileStat,\
+ char typeflag, const char * symlink);
+header extractHeader(char *extractedHeader);
 extern int c = 0, t = 0, x = 0, v = 0; f = 0, S = 0;

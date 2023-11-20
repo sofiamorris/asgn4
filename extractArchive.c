@@ -1,9 +1,5 @@
 #include "mytar.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <sys/stat.h>
-#include <utime.h>
+
 
 void extractArchive(char *pathNames, int file, int argc){
     u_int8_t i = 0, byte = 0, off;
