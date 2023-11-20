@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <sys/stat.h>
 #include "mytar.h"
 
 void writeSym(char *path, int file){
@@ -8,11 +6,6 @@ void writeSym(char *path, int file){
     char *newPath;
     struct stat fileStat;
 
-    /*write the header to the file*/
-    h = makeHeader(/*parameters*/);
-    if (write(file, h, BLOCK_SIZE)){
-        perror("cannot write header");
-    }
     /*get size of symlink*/
     if ((size = readlink(path, NULL, 0)) == -1){
         perror("error with symbolic link size");
@@ -28,20 +21,14 @@ void writeSym(char *path, int file){
         free(newPath);
         exit(EXIT_FAILURE);
     }
-    /*check object pointed to by symlink and call write*/
+    /*get info on link and and write header*/
     if(stat(newPath, &fileStat) == 0){
-        if(S_ISDIR(fileStat.st_mode)){
-            writeDir(newPath, file);
-        }
-        else if(S_ISREG(fileStat.st_mode)){
-            writeFile(newPath, file);
-        }
-        else if (S_ISLNK(fileStat.st_mode)){
-            writeSym(newPath, file);
-        }
-        else{
-            perror("path does not exist");
+        /*write the header to the file*/
+        h = makeHeader(path, fileStat, '2', newPath);
+        if (write(file, &h, BLOCK_SIZE) == -1){
+            perror("cannot write header");
         }
     }
     free(newPath);
+    return;
 }

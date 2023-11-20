@@ -1,18 +1,18 @@
-#include <stdio.h>
-#include <dirent.h>
-#include <sys/stat.h>
 #include "mytar.h"
 
 void writeDir(char *path, int file){
     DIR *dir;
     struct dirent *ent;
     char currentPath[PATH_MAX];
-    struct stat fileStat;
+    struct stat dirStat, fileStat;
     header h;
     
+    if(stat(path, &dirStat) == -1){
+        perror("error stating dir");
+    }
     /*write header for directory*/
-    h = makeHeader(/*parameters*/);
-    if (write(file, h, BLOCK_SIZE)){
+    h = makeHeader(path, dirStat, '5', "");
+    if (write(file, &h, BLOCK_SIZE)){
         perror("cannot write header");
     }
     if((dir = opendir(path)) == NULL){
@@ -44,4 +44,5 @@ void writeDir(char *path, int file){
         }
     }
     closedir(dir);
+    return;
 }

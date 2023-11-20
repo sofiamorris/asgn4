@@ -1,6 +1,4 @@
-#include <stdio.h>
 #include "mytar.h"
-#include <sys/fcntl.h>
 
 void writeFile(char *path, int file){
     int fd; 
@@ -8,6 +6,7 @@ void writeFile(char *path, int file){
     char buffer[BLOCK_SIZE];
     int size = 0;
     header h;
+    struct stat fileStat;
 
     if ((fd = open(path, O_RDONLY, S_IRUSR)) == -1){
         perror("file can't be opened");
@@ -25,8 +24,11 @@ void writeFile(char *path, int file){
         perror("lseek error");
         return;
     }
+    if(stat(path, &fileStat) == -1){
+        perror("error stating dir");
+    }
     /*write header for file*/
-    h = makeHeader(/*parameters*/);
+    h = makeHeader(path, fileStat, '0', "");
     if (write(file, &h, BLOCK_SIZE) == -1){
         perror("cannot write header");
         close(fd);
@@ -48,4 +50,6 @@ void writeFile(char *path, int file){
         fprintf("%s\n", path);
     }
     close(fd);
+    }
+    return;
 }
