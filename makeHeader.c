@@ -7,13 +7,13 @@
    typeflag (3) represented as a single character, a 
    symlink (4) represented as a const char * pointer 
    to the path, ...*/
-header makeHeader(char name[], struct stat fileStat, char typeflag,\
-    const char * symlink)
+header makeHeader(char name[], stat fileStat, char typeflag,
+                  const char * symlink, )
 {
-    header header_st;
+    struct header header_st;
 
-    struct passwd *user_info = getpwuid(fileStat.st_uid);
-    struct group *group_info = getgrgid(fileStat.st_gid);
+    struct passwd *user_info = getpwuid(uid);
+    struct group *group_info = getgrgid(gid);
 
     if (user_info == NULL || group_info == NULL)
     {
@@ -40,88 +40,104 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     char devmajorStr[HD_DEVMAJOR] = {'\0'};
     char devminorStr[HD_DEVMINOR] = {'\0'};
 
- /*name, prefix*/
-
- header_st.prefix[0] = '\0';
-/*Need to implement: if the name continues onto the prefix uncleanly
- (splits one of the file path name), then move that split name to
-the prefix. Also, when going from name to prefix,
- remove the last slash in between the name and the prefix*/
- if (strlen(name) == HD_NAME + 1 &&
-     name[HD_NAME] == '\0')
-     {
-        memcpy(header_st.name, name, HD_NAME);
-
-     }
-else if (strlen(name) == HD_NAME + HD_PREFIX + 1 &&
-         name[HD_NAME + HD_PREFIX] == '\0')
-     {
-        memcpy(header_st.name, name, HD_NAME);
-        memcpy(header_st.prefix, name + HD_NAME, HD_PREFIX);
-     }
-
- else if (strlen(name) > HD_NAME)
+    header header_st = 
     {
-        strncpy(header_st.name, name, HD_NAME);
-        if (strlen(name) > HD_NAME + HD_PREFIX)
-            {
-                perror("makeHeader:name too long");
-                strncpy(header_st.prefix, name + HD_NAME, HD_PREFIX);
-            }
-        else
-        {
-        strncpy(header_st.prefix, name + HD_NAME, strlen(name) - HD_NAME);
-        if (strlen(name) != HD_NAME + HD_PREFIX &&
-            header_st.prefix[strlen(name) - HD_NAME - 1 ] != '\0')
-            {
-                header_st.prefix[strlen(name) - HD_NAME] = '\0';
+    .name = {0},
+    .mode = {0},
+    .uid = {0},
+    .gid = {0},
+    .size = {0},
+    .mtime = {0},
+    .chksum = {0},
+    .typeflag = {0},
+    .linkname = {0},
+    .magic = {0},
+    .version = {0},
+    .uname = {0},
+    .gname = {0},
+    .devmajor = {0},
+    .devminor = {0},
+    .prefix = {0},
+    .padding = {0}
+    };
+ /*name, prefix*/
+    
+   if (strlen(name) > HD_NAME + HD_PREFIX) {
+            perror("makeHeader: name too long");
+            exit(EXIT_FAILURE);
+        }
+    else if (strlen(name) < HD_NAME) {
+        strncpy(header_st.name, name, HD_NAME - 1);
+        header_st.name[HD_NAME - 1] = '\0';
+        header_st.prefix[0] = '\0';
+    } else {
+        int lastSlash = -1;
+        for (int i = HD_NAME; i >= 0; i--) {
+            if (name[i] == '/') {
+                lastSlash = i;
+                break;
             }
         }
-    }
-else
-    {
-        strncpy(header_st.name, name, strlen(name));
-        if (strlen(name) != HD_NAME &&
-            header_st.name[strlen(name) - 1] != '\0' )
-            {
-                header_st.name[strlen(name)] = '\0';
-            }
-        header_st.prefix[0] = '\0';
-    }
 
+        int nameLength, prefixLength;
+
+        if (lastSlash == -1) {
+            nameLength = HD_NAME - 1;
+            prefixLength = strlen(name) - nameLength;
+        } else {
+            nameLength = lastSlash;
+            prefixLength = strlen(name) - lastSlash - 1;
+        }
+
+
+        strncpy(header_st.name, name, nameLength);
+        if (nameLength != 0)
+         {
+             header_st.name[nameLength] = '\0';
+         }
+
+        if (prefixLength > 0) {
+            strncpy(header_st.prefix, name + lastSlash + 1, prefixLength);
+            header_st.prefix[prefixLength] = '\0';
+        } else {
+            header_st.prefix[0] = '\0';
+        }
+    }
+ 
 /*mode*/
    
-    if(mode & (S_IXUSR | S_IXGRP | S_IXOTH))   
-    /* if anyone has execute permissions, grant to all*/
+    if(mode & (S_IXUSR | S_IXGRP | S_IXOTH))   /* if anyone has
+                                            execute permissions,
+                                            grant to all*/
         {
             mode |= (S_IXUSR | S_IXGRP | S_IXOTH);
         }
     snprintf(modeStr, sizeof(modeStr), "%o", mode);
-    strcpy(header_st.mode, modeStr);
+    header_st.mode = modeStr;
 
 /*uid*/
 
     snprintf(uidStr, sizeof(uidStr), "%o", uid);
-    strcpy(header_st.uid, uidStr);
+    header_st.uid = uidStr;
 
 /*gid*/
 
     snprintf(gidStr, sizeof(gidStr), "%o", gid);
-    strcpy(header_st.gid, gidStr);
+    header_st.gid = gidStr;
 
 /*mtime*/
 
     snprintf(uidStr, sizeof(uidStr), "%o", fileStat.st_uid);
-    strcpy(header_st.mtime, mtimeStr);
+    header_st.mtime = mtimeStr;
 
 /*typeflag*/
 
-    strcpy(header_st.typeflag, typeflag);
+    header_st.typeflag = typeflag;
 
 /*linkname*/
 
-    if (header_st.typeflag == '2')  
-    /*'2' is the typeflag rep for a symlink*/
+    if (header_st.typeflag == '2')  /*'2' is the typeflag rep
+                                    for a symlink*/
         {
             if (symlink != NULL)
             {
@@ -142,8 +158,7 @@ else
             }
             else
             {
-                perror("makeHeader: symlink path is NULL");
-            }
+                perror("makeHeader: symlink path is NULL");            }
         }
     
     else
@@ -180,7 +195,7 @@ else
     snprintf(devminorStr, sizeof(devminorStr), "%o", minor(device));
     strncpy(header_st.devminor, devminorStr, HD_DEVMINOR);
 
-/*padding*/
+/*padding (just in case its vals got changed)*/
 
 for (int i = 0; i < HD_PADDING; i++)
 {
@@ -197,7 +212,7 @@ header_st.padding[i] = '\0';
         }
 
     snprintf(chksumStr, sizeof(header_st.chksum), "%o", sum);
-    strcpy(header_st.chksum, chksumStr);
+    header_st.chksum =chksumStr;
 
 
     return header_st;
