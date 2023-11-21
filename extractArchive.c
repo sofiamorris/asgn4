@@ -25,6 +25,17 @@ void extractArchive(char *pathNames, int file, int argc){
                 }
             }
             h = extractHeader(extractedHeader);
+            /*check for S*/
+            if (S){
+                if ((h.magic)[HD_MAGIC - 1] !='\0' || (h.version) != "00"){
+                    return;
+                }
+            }
+            else{
+                if (memcmp(h.magic, "ustar", 5) != 0){
+                    return;
+                }
+            }
             /*convert strings to ints*/
             intChksum = strtol(h.chksum, &endptr, 8);
             if (*endptr != '\0'){
@@ -108,6 +119,17 @@ void extractArchive(char *pathNames, int file, int argc){
                 }
             }
             h = extractHeader(extractedHeader);
+            /*check for S*/
+            if (S){
+                if ((h.magic)[HD_MAGIC - 1] !='\0' || (h.version) != "00"){
+                    return;
+                }
+            }
+            else{
+                if (memcmp(h.magic, "ustar", 5) != 0){
+                    return;
+                }
+            }
             /*convert strings to ints*/
             intChksum = strtol(h.chksum, &endptr, 8);
             if (*endptr != '\0'){

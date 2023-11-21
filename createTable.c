@@ -14,8 +14,9 @@ void createTable(char *pathNames, int file, int argc){
     int pathIt, j, k, myPerms;
     char pathEnd[PATH_MAX];
     char fullPerms[] = "rwx";
-    char permString[PERM_STRING];
+    char permString[PERM_STRING], uid;
     char typeFlag[HD_TYPEFLAG + 1];
+    struct passwd *pwd_entry;
 
     /*check if any paths were entered in command line*/
     if(strcmp(pathNames, "") == 0){
@@ -28,6 +29,17 @@ void createTable(char *pathNames, int file, int argc){
                 }
             }
             h = extractHeader(extractedHeader);
+            /*check for S*/
+            if (S){
+                if ((h.magic)[HD_MAGIC - 1] !='\0' || (h.version) != "00"){
+                    return;
+                }
+            }
+            else{
+                if (memcmp(h.magic, "ustar", 5) != 0){
+                    return;
+                }
+            }
             /*convert strings to ints*/
             intChksum = strtol(h.chksum, &endptr, 8);
             if (*endptr != '\0'){
@@ -87,9 +99,17 @@ void createTable(char *pathNames, int file, int argc){
                 }
                 typeFlag[HD_TYPEFLAG] = '\0';
                 /*create string consisting of permissions,
-                 owner/group, size, and Mtime using offsets*/
-                printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
-                 permString, h.uid, h.gid, h.size, h.mtime, fullName);
+                owner/group, size, and Mtime using offsets*/
+                if(h.uname == NULL || h.gname == NULL){
+                    /*use uid and gid if symbolic names unavailable*/
+                    printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
+                    permString, h.uid, h.gid, h.size, h.mtime, fullName);
+                }
+                else{
+                    /*use uname and gname*/
+                    printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
+                    permString, h.uname, h.gname, h.size, h.mtime, fullName);
+                }
             }
             else{
                 /*read path name and print it*/
@@ -115,6 +135,18 @@ void createTable(char *pathNames, int file, int argc){
                 }
             }
             h = extractHeader(extractedHeader);
+            /*check for S*/
+            if (S){
+                if ((h.magic)[HD_MAGIC - 1] !='\0' || (h.version) != "00"){
+                    return;
+                }
+            }
+            else{
+                if (memcmp(h.magic, "ustar", 5) != 0){
+                    return;
+                }
+            }
+            /*convert chksum to an int and check for last 2 null blocks*/
             intChksum = strtol(h.chksum, &endptr, 8);
             if (*endptr != '\0'){
                 perror("error converting size to int");
@@ -185,8 +217,18 @@ void createTable(char *pathNames, int file, int argc){
                         typeFlag[HD_TYPEFLAG] = '\0';
                         /*create string consisting of permissions,
                         owner/group, size, and Mtime using offsets*/
-                        printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
-                        permString, h.uid, h.gid, h.size, h.mtime, fullName);
+                        if(h.uname == NULL || h.gname == NULL){
+                            /*use uid and gid if symbolic names unavailable*/
+                            printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
+                             permString, h.uid, h.gid,\
+                              h.size, h.mtime, fullName);
+                        }
+                        else{
+                            /*use uname and gname*/
+                            printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
+                            permString, h.uname, h.gname,\
+                             h.size, h.mtime, fullName);
+                        }
                     }
                     else{
                         /*read path name and print it*/
