@@ -40,12 +40,13 @@ void writeFile(char *path, int file){
             perror("cannot read byte in file");
             return;
         }
+        /*add padding to buffer*/
+        fillZeros(h.size, buffer);
         if (write(file, buffer, bytesRead) == -1){
             perror("cannot write file");
             close(fd);
             return;
         }
-    /*write padding here*/
     if(v){
         fprintf("%s\n", path);
     }

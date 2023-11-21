@@ -13,7 +13,7 @@ void extractArchive(char *pathNames, int file, int argc){
     int reachedPath = 0;
     int pathIt, numBlocks;
     char pathEnd[PATH_MAX];
-    mode_t perms = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+    mode_t perms = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
     
     if (strcmp(pathNames, "") == 0){
         while(1){
@@ -106,6 +106,7 @@ void extractArchive(char *pathNames, int file, int argc){
             }
             else{
                 perror("file type unidentifiable");
+                exit(EXIT_FAILURE);
             }
         }
     } 

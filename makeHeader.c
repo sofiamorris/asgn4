@@ -7,13 +7,13 @@
    typeflag (3) represented as a single character, a 
    symlink (4) represented as a const char * pointer 
    to the path, ...*/
-header makeHeader(char name[], stat fileStat, char typeflag,
-                  const char * symlink, )
+header makeHeader(char name[], struct stat fileStat, char typeflag,\
+    const char * symlink)
 {
-    struct header header_st;
+    header header_st;
 
-    struct passwd *user_info = getpwuid(uid);
-    struct group *group_info = getgrgid(gid);
+    struct passwd *user_info;
+    struct group *group_info;
 
     if (user_info == NULL || group_info == NULL)
     {
@@ -60,8 +60,9 @@ header makeHeader(char name[], stat fileStat, char typeflag,
     .prefix = {0},
     .padding = {0}
     };
+
  /*name, prefix*/
-    
+
    if (strlen(name) > HD_NAME + HD_PREFIX) {
             perror("makeHeader: name too long");
             exit(EXIT_FAILURE);
@@ -103,36 +104,35 @@ header makeHeader(char name[], stat fileStat, char typeflag,
             header_st.prefix[0] = '\0';
         }
     }
- 
+
 /*mode*/
    
-    if(mode & (S_IXUSR | S_IXGRP | S_IXOTH))   /* if anyone has
-                                            execute permissions,
-                                            grant to all*/
+    if(mode & (S_IXUSR | S_IXGRP | S_IXOTH))   
+    /* if anyone has execute permissions, grant to all*/
         {
             mode |= (S_IXUSR | S_IXGRP | S_IXOTH);
         }
     snprintf(modeStr, sizeof(modeStr), "%o", mode);
-    header_st.mode = modeStr;
+    strcpy(header_st.mode, modeStr);
 
 /*uid*/
 
     snprintf(uidStr, sizeof(uidStr), "%o", uid);
-    header_st.uid = uidStr;
+    strcpy(header_st.uid, uidStr);
 
 /*gid*/
 
     snprintf(gidStr, sizeof(gidStr), "%o", gid);
-    header_st.gid = gidStr;
+    strcpy(header_st.gid, gidStr);
 
 /*mtime*/
 
     snprintf(uidStr, sizeof(uidStr), "%o", fileStat.st_uid);
-    header_st.mtime = mtimeStr;
+    strcpy(header_st.mtime, mtimeStr);
 
 /*typeflag*/
 
-    header_st.typeflag = typeflag;
+    strcpy(header_st.typeflag, typeflag);
 
 /*linkname*/
 
@@ -177,11 +177,13 @@ header makeHeader(char name[], stat fileStat, char typeflag,
 
 /*uname*/
 
+    user_info->pw_name = getpwuid(fileStat.st_uid);;
     strncpy(header_st.uname, user_info->pw_name, HD_UNAME);
     header_st.uname[HD_UNAME - 1] = '\0';
 
 /*gname*/
 
+    group_info->gr_name = getgrgid(fileStat.st_gid);
     strncpy(header_st.gname, group_info->gr_name, HD_GNAME);
     header_st.gname[HD_GNAME - 1] = '\0';
 
@@ -212,7 +214,7 @@ header_st.padding[i] = '\0';
         }
 
     snprintf(chksumStr, sizeof(header_st.chksum), "%o", sum);
-    header_st.chksum =chksumStr;
+    strcpy(header_st.chksum, chksumStr);
 
 
     return header_st;
