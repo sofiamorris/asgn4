@@ -53,7 +53,8 @@ void createTable(char *pathNames, int file, int argc){
                 }
             }
             /* fill fullName combining offsets of name and prefix*/
-            for(off=(size_t)OFF_NAME;off<(size_t)(OFF_NAME + HD_NAME);off++){
+            for(off=(unsigned char)OFF_NAME;\
+                off<(unsigned char)(OFF_NAME + HD_NAME);off++){
             if(extractedHeader[off] == '\0'){
                 break;
                 }
@@ -62,8 +63,8 @@ void createTable(char *pathNames, int file, int argc){
             }
             fullName[byte] = '/';
             byte++;
-            for(off=(size_t)OFF_PREFIX;\
-                off<(size_t)(OFF_PREFIX+HD_PREFIX);off++){
+            for(off=(unsigned char)OFF_PREFIX;\
+                off<(unsigned char)(OFF_PREFIX+HD_PREFIX);off++){
                 if(extractedHeader[off] == '\0'){
                     break;
                 }
@@ -160,7 +161,8 @@ void createTable(char *pathNames, int file, int argc){
                 }
             }
             /* fill fullName combining offsets of name and prefix*/
-            for(off=(size_t)OFF_NAME;off<(size_t)(OFF_NAME + HD_NAME);off++){
+            for(off=(unsigned char)OFF_NAME;\
+                off<(unsigned char)(OFF_NAME + HD_NAME);off++){
             if(extractedHeader[off] == '\0'){
                 break;
                 }
@@ -169,8 +171,8 @@ void createTable(char *pathNames, int file, int argc){
             }
             fullName[byte] = '/';
             byte++;
-            for(off=(size_t)OFF_PREFIX;\
-                off < (size_t)(OFF_PREFIX + HD_PREFIX); off++){
+            for(off=(unsigned char)OFF_PREFIX;\
+                off < (unsigned char)(OFF_PREFIX + HD_PREFIX); off++){
                 if(extractedHeader[off] == '\0'){
                     break;
                 }
