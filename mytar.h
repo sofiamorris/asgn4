@@ -8,7 +8,8 @@
 #include <sys/fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
-
+#include <sys/time.h>
+#include <arpa/inet.h>
 
 #ifndef PATH_MAX
 #define PATH_MAX 256

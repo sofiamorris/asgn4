@@ -2,6 +2,9 @@
 
 size_t fillZeros(int fileSize, char *filePtr)
 {   
+    int i;
+    int padding; 
+
     if (fileSize < 0)
         {
             perror("fillZeros: invalid file size");
@@ -16,8 +19,8 @@ size_t fillZeros(int fileSize, char *filePtr)
         {
             return fileSize;
         }
-    int padding = BLOCK_SIZE % (BLOCK_SIZE - fileSize);
-    for (int i = 0; i < padding; i++)
+    padding = BLOCK_SIZE % (BLOCK_SIZE - fileSize);
+    for (i = 0; i < padding; i++)
     {
         filePtr[fileSize + i] = '\0';
     }

@@ -52,11 +52,6 @@ int main(int argc, char *argv[]){
 		perror("No archive file");
 		exit(EXIT_FAILURE);
 	}
-	if(S){
-		/*do ustar stuff, only for t and x?*/
-		/*if ustar is null terminated and version is '00': continue*/
-		/*else exit?*/
-	}
 	if(c){
 		if(argv[3]){
 			createArchive(argv[3], file);

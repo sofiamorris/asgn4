@@ -5,7 +5,6 @@
 
 void createArchive(char *path, int file){
     struct stat fileStat;
-    int i = 0;
 
     if(stat(path, &fileStat) == 0){
         if(S_ISDIR(fileStat.st_mode)){

@@ -12,11 +12,9 @@ void createTable(char *pathNames, int file, int argc){
     int nullBlocks = 0;
     int reachedPath = 0;
     int pathIt, j, k, myPerms;
-    char pathEnd[PATH_MAX];
     char fullPerms[] = "rwx";
-    char permString[PERM_STRING], uid;
+    char permString[PERM_STRING];
     char typeFlag[HD_TYPEFLAG + 1];
-    struct passwd *pwd_entry;
 
     /*check if any paths were entered in command line*/
     if(strcmp(pathNames, "") == 0){
@@ -31,7 +29,8 @@ void createTable(char *pathNames, int file, int argc){
             h = extractHeader(extractedHeader);
             /*check for S*/
             if (S){
-                if ((h.magic)[HD_MAGIC - 1] !='\0' || (h.version) != "00"){
+                if (h.magic[HD_MAGIC - 1] != '\0'\
+                    || strcmp((h.version),"00") != 0){
                     return;
                 }
             }
@@ -54,7 +53,7 @@ void createTable(char *pathNames, int file, int argc){
                 }
             }
             /* fill fullName combining offsets of name and prefix*/
-            for(off = OFF_NAME; off < (OFF_NAME + HD_NAME); off++){
+            for(off=(size_t)OFF_NAME;off<(size_t)(OFF_NAME + HD_NAME);off++){
             if(extractedHeader[off] == '\0'){
                 break;
                 }
@@ -63,7 +62,8 @@ void createTable(char *pathNames, int file, int argc){
             }
             fullName[byte] = '/';
             byte++;
-            for(off = OFF_PREFIX; off < (OFF_PREFIX + HD_PREFIX); off++){
+            for(off=(size_t)OFF_PREFIX;\
+                off<(size_t)(OFF_PREFIX+HD_PREFIX);off++){
                 if(extractedHeader[off] == '\0'){
                     break;
                 }
@@ -80,18 +80,18 @@ void createTable(char *pathNames, int file, int argc){
                     perror("error converting size to int");
                     exit(EXIT_FAILURE);
                 }
-                for (int j = 2; j >= 0; j--){
+                for (j = 2; j >= 0; j--){
                     myPerms = (intMode >> (j * 3)) & 0x7;
                     for (k = 2; k >= 0; k--){
                         permString[(2 - k) + ((2 - j) * 3)]\
-                        = (myPerms & (1 << k)) ? fullPerms[k] : "-";
+                        = (myPerms & (1 << k)) ? fullPerms[k] : '-';
                     }
                 }
                 permString[PERM_STRING - 1] = '\0';
-                if (h.typeflag == '5'){
+                if (strcmp(h.typeflag,"5") == 0){
                     typeFlag[0] = 'd';
                 }
-                else if (h.typeflag == '2'){
+                else if (strcmp(h.typeflag,"2") == 0){
                     typeFlag[0] = 'l';
                 }
                 else{
@@ -102,12 +102,12 @@ void createTable(char *pathNames, int file, int argc){
                 owner/group, size, and Mtime using offsets*/
                 if(h.uname == NULL || h.gname == NULL){
                     /*use uid and gid if symbolic names unavailable*/
-                    printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
+                    printf("%s%s %s/%s %s %s %s\n", typeFlag,\
                     permString, h.uid, h.gid, h.size, h.mtime, fullName);
                 }
                 else{
                     /*use uname and gname*/
-                    printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
+                    printf("%s%s %s/%s %s %s %s\n", typeFlag,\
                     permString, h.uname, h.gname, h.size, h.mtime, fullName);
                 }
             }
@@ -137,7 +137,8 @@ void createTable(char *pathNames, int file, int argc){
             h = extractHeader(extractedHeader);
             /*check for S*/
             if (S){
-                if ((h.magic)[HD_MAGIC - 1] !='\0' || (h.version) != "00"){
+                if (h.magic[HD_MAGIC - 1] != '\0'\
+                    || strcmp((h.version),"00") != 0){
                     return;
                 }
             }
@@ -159,7 +160,7 @@ void createTable(char *pathNames, int file, int argc){
                 }
             }
             /* fill fullName combining offsets of name and prefix*/
-            for(off = OFF_NAME; off < HD_NAME; off++){
+            for(off=(size_t)OFF_NAME;off<(size_t)(OFF_NAME + HD_NAME);off++){
             if(extractedHeader[off] == '\0'){
                 break;
                 }
@@ -168,7 +169,8 @@ void createTable(char *pathNames, int file, int argc){
             }
             fullName[byte] = '/';
             byte++;
-            for(off = OFF_PREFIX; off < HD_PREFIX; off++){
+            for(off=(size_t)OFF_PREFIX;\
+                off < (size_t)(OFF_PREFIX + HD_PREFIX); off++){
                 if(extractedHeader[off] == '\0'){
                     break;
                 }
@@ -197,18 +199,18 @@ void createTable(char *pathNames, int file, int argc){
                             perror("error converting size to int");
                             exit(EXIT_FAILURE);
                         }
-                        for (int j = 2; j >= 0; j--){
+                        for (j = 2; j >= 0; j--){
                             myPerms = (intMode >> (j * 3)) & 0x7;
                             for (k = 2; k >= 0; k--){
                                 permString[(2 - k) + ((2 - j) * 3)]\
-                                = (myPerms & (1 << k)) ? fullPerms[k] : "-";
+                                = (myPerms & (1 << k)) ? fullPerms[k] : '-';
                             }
                         }
                         permString[PERM_STRING - 1] = '\0';
-                        if (h.typeflag == '5'){
+                        if (strcmp(h.typeflag,"5") == 0){
                             typeFlag[0] = 'd';
                         }
-                        else if (h.typeflag == '2'){
+                        else if (strcmp(h.typeflag,"2") == 0){
                             typeFlag[0] = 'l';
                         }
                         else{
@@ -219,13 +221,13 @@ void createTable(char *pathNames, int file, int argc){
                         owner/group, size, and Mtime using offsets*/
                         if(h.uname == NULL || h.gname == NULL){
                             /*use uid and gid if symbolic names unavailable*/
-                            printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
+                            printf("%s%s %s/%s %s %s %s\n", typeFlag,\
                              permString, h.uid, h.gid,\
                               h.size, h.mtime, fullName);
                         }
                         else{
                             /*use uname and gname*/
-                            printf("%s%s %s/%s %s %s %s %s\n", typeFlag,\
+                            printf("%s%s %s/%s %s %s %s\n", typeFlag,\
                             permString, h.uname, h.gname,\
                              h.size, h.mtime, fullName);
                         }
