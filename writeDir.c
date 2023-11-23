@@ -11,7 +11,7 @@ void writeDir(char *path, int file, int v, int S){
         perror("error stating dir");
     }
     /*write header for directory*/
-    h = makeHeader(path, dirStat, '5', "", S);
+    h = makeHeader(path, dirStat, '5', "", 0, S);
     if (write(file, &h, BLOCK_SIZE)){
         perror("cannot write header");
     }

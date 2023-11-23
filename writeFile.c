@@ -14,14 +14,14 @@ void writeFile(char *path, int file, int v, int S){
         return;
     }
     /*get size of file for header*/
-    while ((bytesRead = read(fd, buffer, BLOCK_SIZE) > 0)){
+    while ((bytesRead = read(fd, buffer, BLOCK_SIZE)) > 0){
         if (bytesRead == -1){
             perror("cannot read byte in file");
             return;
         }
         size+=bytesRead;
     }
-    if (lseek(fd, 0, SEEK_SET) == -1){
+    if (lseek(fd, -bytesRead, SEEK_CUR) == -1){
         perror("lseek error");
         return;
     }
@@ -29,7 +29,7 @@ void writeFile(char *path, int file, int v, int S){
         perror("error stating dir");
     }
     /*write header for file*/
-    h = makeHeader(path, fileStat, '0', "", S);
+    h = makeHeader(path, fileStat, '0', "", size, S);
     if (write(file, &h, BLOCK_SIZE) == -1){
         perror("cannot write header");
         close(fd);

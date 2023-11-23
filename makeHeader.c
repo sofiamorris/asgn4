@@ -8,7 +8,7 @@
    symlink (4) represented as a const char * pointer 
    to the path, ...*/
 header makeHeader(char name[], struct stat fileStat, char typeflag,\
-    const char * symlink, int S)
+    const char * symlink, int size, int S)
 {
     struct passwd *user_info = getpwuid(fileStat.st_uid);
     struct group *group_info = getgrgid(fileStat.st_gid);
@@ -32,6 +32,7 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     char modeStr[HD_MODE] = {'\0'};
     char uidStr[HD_UID] = {'\0'};
     char gidStr[HD_GID] = {'\0'};
+    char sizeStr[HD_SIZE] = {'\0'};
     char mtimeStr[HD_MTIME] = {'\0'};
     char chksumStr[HD_CHKSUM] = {'\0'};
     char typeflagStr[HD_TYPEFLAG] = {'\0'};
@@ -120,6 +121,10 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
 
     snprintf(gidStr, sizeof(gidStr), "%o", gid);
     strcpy(header_st.gid, gidStr);
+
+/*size*/
+    snprintf(sizeStr, sizeof(sizeStr), "%o", size);
+    strcpy(header_st.size, size);
 
 /*mtime*/
 

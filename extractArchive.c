@@ -18,11 +18,18 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
     if (pathNames == NULL){
         while(1){
             /*read bytes into header array*/
-            while ((bytesRead = read(file, extractedHeader, BLOCK_SIZE) > 0)){
-                if (bytesRead == -1){
-                        perror("cannot read header");
-                        exit(EXIT_FAILURE);
-                }
+            bytesRead = read(file, extractedHeader, BLOCK_SIZE);
+            if (bytesRead == -1){
+                    perror("cannot read header");
+                    exit(EXIT_FAILURE);
+            }
+            if (bytesRead == BLOCK_SIZE\
+                && strncmp(extractedHeader + 257, "ustar", 5) == 0) {
+                /*nothing*/
+            } else {
+                close(file);
+                perror("file not valid");
+                exit(EXIT_FAILURE);
             }
             h = extractHeader(extractedHeader);
             /*check for S*/
@@ -98,7 +105,8 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                 perms = perms & ~umask(0);
                 perms = perms | (intMode & (ALLMODE));
                 numBlocks = intSize / BLOCK_SIZE;
-                extractFile(fullName,numBlocks,perms,file,(time_t)intMtime);
+                extractFile(fullName, numBlocks,\
+                 perms, file, (time_t)intMtime, intSize);
             }
             /*if symlink, then create symlink*/
             else if (extractedHeader[OFF_TYPEFLAG] == '2'){
@@ -113,11 +121,18 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
     else{
         while(1){
             /*read bytes into header array*/
-            while ((bytesRead = read(file, extractedHeader, BLOCK_SIZE) > 0)){
-                if (bytesRead == -1){
-                        perror("cannot read header");
-                        exit(EXIT_FAILURE);
-                }
+            bytesRead = read(file, extractedHeader, BLOCK_SIZE);
+            if (bytesRead == -1){
+                    perror("cannot read header");
+                    exit(EXIT_FAILURE);
+            }
+            if (bytesRead == BLOCK_SIZE\
+                && strncmp(extractedHeader + 257, "ustar", 5) == 0) {
+                /*nothing*/
+            } else {
+                close(file);
+                perror("file not valid");
+                exit(EXIT_FAILURE);
             }
             h = extractHeader(extractedHeader);
             /*check for S*/
@@ -208,7 +223,7 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                         perms = perms | (intMode & (ALLMODE));
                         numBlocks = intSize / BLOCK_SIZE;
                         extractFile(fullName,numBlocks,perms,\
-                        file,(time_t)intMtime);
+                        file,(time_t)intMtime, intSize);
                     }
                     /*if symlink, then create symlink*/
                     else if (extractedHeader[OFF_TYPEFLAG] == '2'){

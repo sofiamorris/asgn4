@@ -1,4 +1,3 @@
-#include  <unistd.h>
 #include "mytar.h"
 
 void writeSym(char *path, int file, int v, int S){
@@ -25,7 +24,7 @@ void writeSym(char *path, int file, int v, int S){
     /*get info on link and and write header*/
     if(stat(newPath, &fileStat) == 0){
         /*write the header to the file*/
-        h = makeHeader(path, fileStat, '2', newPath, S);
+        h = makeHeader(path, fileStat, '2', newPath, 0, S);
         if (write(file, &h, BLOCK_SIZE) == -1){
             perror("cannot write header");
         }

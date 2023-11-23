@@ -21,11 +21,18 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
     if(pathNames == NULL){
         while(1){
             /*read bytes into header array*/
-            while ((bytesRead = read(file, extractedHeader, BLOCK_SIZE) > 0)){
-                if (bytesRead == -1){
-                        perror("cannot read header");
-                        exit(EXIT_FAILURE);
-                }
+            bytesRead = read(file, extractedHeader, BLOCK_SIZE);
+            if (bytesRead == -1){
+                    perror("cannot read header");
+                    exit(EXIT_FAILURE);
+            }
+            if (bytesRead == BLOCK_SIZE\
+                && strncmp(extractedHeader + 257, "ustar", 5) == 0) {
+                /*nothing*/
+            } else {
+                close(file);
+                perror("file not valid");
+                exit(EXIT_FAILURE);
             }
             h = extractHeader(extractedHeader);
             /*check for S*/
@@ -123,18 +130,25 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /*read SIZE and increase i accordingly*/
-            i = BLOCK_SIZE + (BLOCK_SIZE * (intSize / BLOCK_SIZE));
+            i = BLOCK_SIZE * (intSize / BLOCK_SIZE);
             lseek(file, i, SEEK_CUR);
         }
     }
     else{
         while(1){
             /*read bytes into header array*/
-            while ((bytesRead = read(file, extractedHeader, BLOCK_SIZE) > 0)){
-                if (bytesRead == -1){
-                        perror("cannot read header");
-                        exit(EXIT_FAILURE);
-                }
+            bytesRead = read(file, extractedHeader, BLOCK_SIZE);
+            if (bytesRead == -1){
+                    perror("cannot read header");
+                    exit(EXIT_FAILURE);
+            }
+            if (bytesRead == BLOCK_SIZE\
+                && strncmp(extractedHeader + 257, "ustar", 5) == 0) {
+                /*nothing*/
+            } else {
+                close(file);
+                perror("file not valid");
+                exit(EXIT_FAILURE);
             }
             h = extractHeader(extractedHeader);
             /*check for S*/
@@ -250,7 +264,7 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /*read SIZE and increase i accordingly*/
-            i = BLOCK_SIZE + (BLOCK_SIZE * (intSize / BLOCK_SIZE));
+            i = BLOCK_SIZE * (intSize / BLOCK_SIZE);
             lseek(file, i, SEEK_CUR);
         }
     }
