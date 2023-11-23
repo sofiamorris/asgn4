@@ -1,5 +1,5 @@
 C = gcc
-CFLAGS = -g -Wall -ansi -pedantic
+CFLAGS = -g -Wall -std=c99 -pedantic
 
 all: mytar
 

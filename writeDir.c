@@ -21,7 +21,8 @@ void writeDir(char *path, int file, int v, int S){
     else{
         /*iterate through objects coming out of directory*/
         while((ent = readdir(dir)) != NULL){
-            if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
+            if (strcmp(ent->d_name, ".") == 0 ||\
+                strcmp(ent->d_name, "..") == 0) {
                 continue;
             }
             /*get path of object*/

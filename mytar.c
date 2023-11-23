@@ -5,6 +5,8 @@ int main(int argc, char *argv[]){
 	int c = 0, t = 0, x = 0, f = 0, v = 0, S = 0;
 	char *pathNames[PATH_MAX];
 	char *emptyList[1] = { NULL };
+    char buffer[BLOCK_SIZE];
+    size_t bytesRead;
 
 	/*read in options from argv[1]*/
 	if (argv[1]){
@@ -40,7 +42,8 @@ int main(int argc, char *argv[]){
 	}
 	/*check options for next instruction*/
 	if(f && argv[2] && c){
-		file = open(argv[2], O_RDWR | O_CREAT | O_TRUNC, S_IRUSR, S_IWUSR);
+		file = open(argv[2], O_RDWR | O_CREAT | O_TRUNC,\
+        S_IRUSR, S_IWUSR);
 	}
 	else if(f && argv[2] && (t | x)){
 		file = open(argv[2], O_RDONLY, S_IRUSR);
@@ -49,6 +52,15 @@ int main(int argc, char *argv[]){
 		perror("No archive file");
 		exit(EXIT_FAILURE);
 	}
+    bytesRead = read(file, buffer, BLOCK_SIZE);
+    if (bytesRead == BLOCK_SIZE\
+        && strncmp(buffer + 257, "ustar", 5) == 0) {
+        /*nothing*/
+    } else {
+        close(file);
+        perror("file not valid");
+        exit(EXIT_FAILURE);
+    }
 	if(c){
 		if(argv[3]){
 			if (strlen(argv[3]) > PATH_MAX){

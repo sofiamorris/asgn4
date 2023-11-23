@@ -36,8 +36,6 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     char chksumStr[HD_CHKSUM] = {'\0'};
     char typeflagStr[HD_TYPEFLAG] = {'\0'};
     char linknameStr[HD_LINKNAME] = {'\0'};
-    char devmajorStr[HD_DEVMAJOR] = {'\0'};
-    char devminorStr[HD_DEVMINOR] = {'\0'};
 
     header header_st = {
     .name = {0},
@@ -184,15 +182,7 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     strncpy(header_st.gname, group_info->gr_name, HD_GNAME);
     header_st.gname[HD_GNAME - 1] = '\0';
 
-/*devmajor*/
-
-    snprintf(devmajorStr, sizeof(devmajorStr), "%o", major(device));
-    strncpy(header_st.devmajor, devmajorStr, HD_DEVMAJOR);
-
-/*devminor*/
-
-    snprintf(devminorStr, sizeof(devminorStr), "%o", minor(device));
-    strncpy(header_st.devminor, devminorStr, HD_DEVMINOR);
+/*leave devmajor and devminor empty*/
 
 /*padding (just in case its vals got changed)*/
 

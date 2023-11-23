@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <sys/types.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
@@ -6,7 +8,6 @@
 #include <sys/stat.h>
 #include <utime.h>
 #include <sys/fcntl.h>
-#include <unistd.h>
 #include <dirent.h>
 #include <sys/time.h>
 #include <arpa/inet.h>

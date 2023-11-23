@@ -1,3 +1,4 @@
+#include  <unistd.h>
 #include "mytar.h"
 
 void writeSym(char *path, int file, int v, int S){
