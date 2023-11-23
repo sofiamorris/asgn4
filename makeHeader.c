@@ -8,12 +8,10 @@
    symlink (4) represented as a const char * pointer 
    to the path, ...*/
 header makeHeader(char name[], struct stat fileStat, char typeflag,\
-    const char * symlink)
+    const char * symlink, int S)
 {
-    header header_st;
-
-    struct passwd *user_info;
-    struct group *group_info;
+    struct passwd *user_info = getpwuid(fileStat.st_uid);
+    struct group *group_info = getgrgid(fileStat.st_gid);
 
     if (user_info == NULL || group_info == NULL)
     {
@@ -36,12 +34,12 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     char gidStr[HD_GID] = {'\0'};
     char mtimeStr[HD_MTIME] = {'\0'};
     char chksumStr[HD_CHKSUM] = {'\0'};
+    char typeflagStr[HD_TYPEFLAG] = {'\0'};
     char linknameStr[HD_LINKNAME] = {'\0'};
     char devmajorStr[HD_DEVMAJOR] = {'\0'};
     char devminorStr[HD_DEVMINOR] = {'\0'};
 
-    header header_st = 
-    {
+    header header_st = {
     .name = {0},
     .mode = {0},
     .uid = {0},
@@ -127,12 +125,13 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
 
 /*mtime*/
 
-    snprintf(uidStr, sizeof(uidStr), "%o", fileStat.st_uid);
+    snprintf(mtimeStr, sizeof(mtimeStr), "%ld", (long)mtime);
     strcpy(header_st.mtime, mtimeStr);
 
 /*typeflag*/
 
-    strcpy(header_st.typeflag, typeflag);
+    snprintf(typeflagStr, sizeof(typeflagStr), "%o", typeflag);
+    strcpy(header_st.typeflag, typeflagStr);
 
 /*linkname*/
 
@@ -177,13 +176,11 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
 
 /*uname*/
 
-    user_info->pw_name = getpwuid(fileStat.st_uid);;
     strncpy(header_st.uname, user_info->pw_name, HD_UNAME);
     header_st.uname[HD_UNAME - 1] = '\0';
 
 /*gname*/
 
-    group_info->gr_name = getgrgid(fileStat.st_gid);
     strncpy(header_st.gname, group_info->gr_name, HD_GNAME);
     header_st.gname[HD_GNAME - 1] = '\0';
 
@@ -208,9 +205,9 @@ header_st.padding[i] = '\0';
 
     unsigned char *bytes = (unsigned char *) &header_st;
     unsigned int sum = 0;
-    for (size_t i = 0; i < sizeof(header_st); i++)
+    for (size_t j = 0; j < sizeof(header_st); j++)
         {
-            sum += bytes[i];
+            sum += bytes[j];
         }
 
     snprintf(chksumStr, sizeof(header_st.chksum), "%o", sum);

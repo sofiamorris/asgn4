@@ -4,7 +4,7 @@ CFLAGS = -g -Wall -ansi -pedantic
 all: mytar
 
 mytar: createArchive.o createTable.o extractArchive.o extractDir.o extractFile.o extractHeader.o extractSymLink.o fillZeros.o makeDirHier.o makeHeader.o mytar.o writeDir.o writeFile.o writeSym.o
-	$(CC) $(CFLAGS) -o createArchive.o createTable.o extractArchive.o extractDir.o extractFile.o extractHeader.o extractSymLink.o fillZeros.o makeDirHier.o makeHeader.o mytar.o writeDir.o writeFile.o writeSym.o
+	$(CC) $(CFLAGS) -o mytar createArchive.o createTable.o extractArchive.o extractDir.o extractFile.o extractHeader.o extractSymLink.o fillZeros.o makeDirHier.o makeHeader.o mytar.o writeDir.o writeFile.o writeSym.o
 
 mytar.o: mytar.c mytar.h
 	$(CC) -c -o mytar.o mytar.c $(CFLAGS)

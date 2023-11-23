@@ -1,6 +1,6 @@
 #include "mytar.h"
 
-void writeSym(char *path, int file){
+void writeSym(char *path, int file, int v, int S){
     header h; 
     ssize_t size, bytes;
     char *newPath;
@@ -24,7 +24,7 @@ void writeSym(char *path, int file){
     /*get info on link and and write header*/
     if(stat(newPath, &fileStat) == 0){
         /*write the header to the file*/
-        h = makeHeader(path, fileStat, '2', newPath);
+        h = makeHeader(path, fileStat, '2', newPath, S);
         if (write(file, &h, BLOCK_SIZE) == -1){
             perror("cannot write header");
         }

@@ -10,12 +10,13 @@
 #include <dirent.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
+#include <pwd.h>
+#include <grp.h>
 
 #ifndef PATH_MAX
 #define PATH_MAX 256
 #endif
 #define BLOCK_SIZE 512
-#include <string.h>
 
 /*Field Definitions (No magic number here!)*/
 #define HD_NAME 100
@@ -76,17 +77,17 @@ typedef struct __attribute__ ((__packed__)) header_st{
 }header;
 
 int main(int argc, char *argv[]);
-void createArchive(char *path, int file);
-void createTable(char *pathNames, int file, int argc);
-void writeDir(char *path, int file);
-void writeFile(char *path, int file);
-void writeSym(char *path, int file);
-void createTable(char *pathNames, int file, int argc);
-void extractArchive(char *pathNames, int file, int argc);
+void createArchive(char *path, int file, int v, int S);
+void writeDir(char *path, int file, int v, int S);
+void writeFile(char *path, int file, int v, int S);
+void writeSym(char *path, int file, int v, int S);
+void createTable(char *pathNames[], int file, int argc, int v, int S);
+void extractArchive(char *pathNames[], int file, int argc, int v, int S);
 void extractFile(char *name,int blocks,mode_t perms,int file,time_t mtime);
 void extractDir(char *name, mode_t perms, time_t mtime);
 void extractSymLink(char *name, char *linkname, time_t mtime);
+void makeDirHier(char *path);
+size_t fillZeros(int fileSize, char *filePtr);
 header makeHeader(char name[], struct stat fileStat,\
- char typeflag, const char * symlink);
+char typeflag, const char * symlink, int S);
 header extractHeader(char *extractedHeader);
-extern int c = 0, t = 0, x = 0, v = 0; f = 0, S = 0;

@@ -3,22 +3,21 @@
 #include <unistd.h>
 #include "mytar.h"
 
-void createArchive(char *path, int file){
+void createArchive(char *path, int file, int v, int S){
     struct stat fileStat;
 
     if(stat(path, &fileStat) == 0){
         if(S_ISDIR(fileStat.st_mode)){
-            writeDir(path, file);
+            writeDir(path, file, v, S);
         }
         else if(S_ISREG(fileStat.st_mode)){
-            writeFile(path, file);
+            writeFile(path, file, v, S);
         }
         else if (S_ISLNK(fileStat.st_mode)){
-            writeSym(path, file);
+            writeSym(path, file, v, S);
         }
         else{
-            perror("path does not exist");
-            exit(EXIT_FAILURE);
+            makeDirHier(path);
         }
     }
 }

@@ -1,8 +1,9 @@
 #include "mytar.h"
 
 
-void extractArchive(char *pathNames, int file, int argc){
-    u_int8_t i = 0, byte = 0, off;
+void extractArchive(char *pathNames[], int file, int argc, int v, int S){
+    u_int8_t byte = 0;
+    unsigned int off;
     char extractedHeader[BLOCK_SIZE];
     header h;
     char *endptr;
@@ -12,10 +13,9 @@ void extractArchive(char *pathNames, int file, int argc){
     int nullBlocks = 0;
     int reachedPath = 0;
     int pathIt, numBlocks;
-    char pathEnd[PATH_MAX];
     mode_t perms = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
     
-    if (strcmp(pathNames, "") == 0){
+    if (pathNames == NULL){
         while(1){
             /*read bytes into header array*/
             while ((bytesRead = read(file, extractedHeader, BLOCK_SIZE) > 0)){
@@ -27,7 +27,7 @@ void extractArchive(char *pathNames, int file, int argc){
             h = extractHeader(extractedHeader);
             /*check for S*/
             if (S){
-                if ((h.magic)[HD_MAGIC - 1] !='\0' || (h.version) != "00"){
+                if ((h.magic)[HD_MAGIC - 1]!='\0'||strcmp(h.version,"00")!=0){
                     return;
                 }
             }
@@ -122,7 +122,7 @@ void extractArchive(char *pathNames, int file, int argc){
             h = extractHeader(extractedHeader);
             /*check for S*/
             if (S){
-                if ((h.magic)[HD_MAGIC - 1] !='\0' || (h.version) != "00"){
+                if ((h.magic)[HD_MAGIC - 1]!='\0'||strcmp(h.version,"00")!=0){
                     return;
                 }
             }
@@ -143,6 +143,21 @@ void extractArchive(char *pathNames, int file, int argc){
                 if (nullBlocks == 2){
                     break;
                 }
+            }
+            intSize = strtol(h.size, &endptr, 8);
+            if (*endptr != '\0'){
+                perror("error converting size to int");
+                exit(EXIT_FAILURE);
+            }
+            intMode = strtol(h.mode, &endptr, 8);
+            if (*endptr != '\0'){
+                perror("error converting size to int");
+                exit(EXIT_FAILURE);
+            }
+            intMtime = strtol(h.mtime, &endptr, 8);
+            if (*endptr != '\0'){
+                perror("error converting size to int");
+                exit(EXIT_FAILURE);
             }
             /* fill fullName combining offsets of name and prefix*/
             for(off = OFF_NAME; off < HD_NAME; off++){

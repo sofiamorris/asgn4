@@ -1,8 +1,9 @@
 #include "mytar.h"
 #define PERM_STRING 10
 
-void createTable(char *pathNames, int file, int argc){
-    u_int8_t i = 0, byte = 0, off;
+void createTable(char *pathNames[], int file, int argc, int v, int S){
+    u_int8_t i = 0, byte = 0;
+    unsigned int off;
     ssize_t bytesRead;
     char extractedHeader[BLOCK_SIZE];
     header h;
@@ -17,7 +18,7 @@ void createTable(char *pathNames, int file, int argc){
     char typeFlag[HD_TYPEFLAG + 1];
 
     /*check if any paths were entered in command line*/
-    if(strcmp(pathNames, "") == 0){
+    if(pathNames == NULL){
         while(1){
             /*read bytes into header array*/
             while ((bytesRead = read(file, extractedHeader, BLOCK_SIZE) > 0)){
@@ -71,7 +72,7 @@ void createTable(char *pathNames, int file, int argc){
                 fullName[byte] = extractedHeader[off];
                 byte++;
             }
-            if (off == (OFF_PREFIX + HD_PREFIX)){
+            if (off == (unsigned char)(OFF_PREFIX + HD_PREFIX)){
                 fullName[PATH_MAX] = '\0';
             }
             if (v){
@@ -101,7 +102,7 @@ void createTable(char *pathNames, int file, int argc){
                 typeFlag[HD_TYPEFLAG] = '\0';
                 /*create string consisting of permissions,
                 owner/group, size, and Mtime using offsets*/
-                if(h.uname == NULL || h.gname == NULL){
+                if(h.uname[0] == '\0' || h.gname[0] == '\0'){
                     /*use uid and gid if symbolic names unavailable*/
                     printf("%s%s %s/%s %s %s %s\n", typeFlag,\
                     permString, h.uid, h.gid, h.size, h.mtime, fullName);
@@ -179,7 +180,10 @@ void createTable(char *pathNames, int file, int argc){
                 fullName[byte] = extractedHeader[off];
                 byte++;
             }
-            byte = 0;       
+            byte = 0;
+            if (off == (unsigned char)(OFF_PREFIX + HD_PREFIX)){
+                fullName[PATH_MAX] = '\0';
+            }       
             /*iterate through list of pathNames and check if path is reached*/
             for(pathIt = 0; pathIt < argc; pathIt++){
                 if (strcmp(fullName, pathNames[pathIt]) == 0){
@@ -221,7 +225,7 @@ void createTable(char *pathNames, int file, int argc){
                         typeFlag[HD_TYPEFLAG] = '\0';
                         /*create string consisting of permissions,
                         owner/group, size, and Mtime using offsets*/
-                        if(h.uname == NULL || h.gname == NULL){
+                        if(h.uname[0] == '\0' || h.gname[0] == '\0'){
                             /*use uid and gid if symbolic names unavailable*/
                             printf("%s%s %s/%s %s %s %s\n", typeFlag,\
                              permString, h.uid, h.gid,\

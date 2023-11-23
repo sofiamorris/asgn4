@@ -1,13 +1,31 @@
 #include "mytar.h"
 
 header extractHeader(char *extractedHeader){
-    header h;
     char name[HD_NAME], prefix[HD_PREFIX], typeflag[HD_TYPEFLAG];
     char mode[HD_MODE], uid[HD_UID], gid[HD_GID],chksum[HD_CHKSUM];
     char size[HD_SIZE], mtime[HD_MTIME], linkname[HD_LINKNAME];
     char magic[HD_MAGIC], version[HD_VERSION], uname[HD_UNAME];
     char gname[HD_GNAME], devmajor[HD_DEVMAJOR], devminor[HD_DEVMINOR];
     u_int8_t byte = 0, off;
+    header h = {
+    .name = {0},
+    .mode = {0},
+    .uid = {0},
+    .gid = {0},
+    .size = {0},
+    .mtime = {0},
+    .chksum = {0},
+    .typeflag = {0},
+    .linkname = {0},
+    .magic = {0},
+    .version = {0},
+    .uname = {0},
+    .gname = {0},
+    .devmajor = {0},
+    .devminor = {0},
+    .prefix = {0},
+    .padding = {0}
+    };
     
     /*get name*/
     for(off = (unsigned char)OFF_NAME;\

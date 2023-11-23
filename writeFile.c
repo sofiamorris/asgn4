@@ -1,9 +1,10 @@
 #include "mytar.h"
 
-void writeFile(char *path, int file){
-    int fd; 
+void writeFile(char *path, int file, int v, int S){
+    int fd, intSize; 
     ssize_t bytesRead;
     char buffer[BLOCK_SIZE];
+    char *endptr;
     int size = 0;
     header h;
     struct stat fileStat;
@@ -28,7 +29,7 @@ void writeFile(char *path, int file){
         perror("error stating dir");
     }
     /*write header for file*/
-    h = makeHeader(path, fileStat, '0', "");
+    h = makeHeader(path, fileStat, '0', "", S);
     if (write(file, &h, BLOCK_SIZE) == -1){
         perror("cannot write header");
         close(fd);
@@ -41,14 +42,19 @@ void writeFile(char *path, int file){
             return;
         }
         /*add padding to buffer*/
-        fillZeros(h.size, buffer);
+        intSize = strtol(h.size, &endptr, 8);
+            if (*endptr != '\0'){
+                perror("error converting size to int");
+                exit(EXIT_FAILURE);
+            }
+        fillZeros(intSize, buffer);
         if (write(file, buffer, bytesRead) == -1){
             perror("cannot write file");
             close(fd);
             return;
         }
     if(v){
-        fprintf("%s\n", path);
+        printf("%s\n", path);
     }
     close(fd);
     }

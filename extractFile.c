@@ -7,11 +7,11 @@
 #include <utime.h>
 
 void extractFile(char *name,int blocks,mode_t perms,int file,time_t mtime){
-    u_int8_t off;
     char dataBlock[BLOCK_SIZE];
     int extractedFile;
     ssize_t bytesRead;
     struct utimbuf times;
+    char stringFile[PATH_MAX];
 
     /*open new file and give it calculated perms*/
     if((extractedFile = open(name,O_WRONLY | O_CREAT | O_TRUNC, perms))==-1){
@@ -29,12 +29,13 @@ void extractFile(char *name,int blocks,mode_t perms,int file,time_t mtime){
             exit(EXIT_FAILURE);
         }
     }
-    close(extractedFile);
+    sprintf(stringFile, "%d", extractedFile);
     times.modtime = mtime;
-    if (utime(extractedFile, &times) == -1) {
+    if (utime(stringFile, &times) == -1) {
         perror("error setting mtime");
         exit(EXIT_FAILURE);
     }
     printf("%s\n", name);
+    close(extractedFile);
     return;
 }

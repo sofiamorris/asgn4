@@ -1,17 +1,17 @@
 #include "mytar.h"
 
-void writeDir(char *path, int file){
+void writeDir(char *path, int file, int v, int S){
     DIR *dir;
     struct dirent *ent;
     char currentPath[PATH_MAX];
     struct stat dirStat, fileStat;
     header h;
-    
+
     if(stat(path, &dirStat) == -1){
         perror("error stating dir");
     }
     /*write header for directory*/
-    h = makeHeader(path, dirStat, '5', "");
+    h = makeHeader(path, dirStat, '5', "", S);
     if (write(file, &h, BLOCK_SIZE)){
         perror("cannot write header");
     }
@@ -29,16 +29,17 @@ void writeDir(char *path, int file){
             /*check object pointed to by directory and call write*/
             if(stat(currentPath, &fileStat) == 0){
                 if(S_ISDIR(fileStat.st_mode)){
-                    writeDir(currentPath, file);
+                    writeDir(currentPath, file, v, S);
                 }
                 else if(S_ISREG(fileStat.st_mode)){
-                    writeFile(currentPath, file);
+                    writeFile(currentPath, file, v, S);
                 }
                 else if (S_ISLNK(fileStat.st_mode)){
-                    writeSym(currentPath, file);
+                    writeSym(currentPath, file, v, S);
                 }
                 else{
-                    perror("path does not exist");
+                    makeDirHier(currentPath);
+                    writeDir(currentPath, file, v, S);
                 }
             }
         }

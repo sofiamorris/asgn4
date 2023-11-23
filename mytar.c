@@ -1,13 +1,10 @@
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
 #include "mytar.h"
-#include <unistd.h>
 
 int main(int argc, char *argv[]){
-	int i, file;
-	static int c = 0, t = 0, x = 0, v = 0; f = 0, S = 0;
-	char path[PATH_MAX];
+	int i, j, file;
+	int c = 0, t = 0, x = 0, f = 0, v = 0, S = 0;
+	char *pathNames[PATH_MAX];
+	char *emptyList[1] = { NULL };
 
 	/*read in options from argv[1]*/
 	if (argv[1]){
@@ -54,52 +51,67 @@ int main(int argc, char *argv[]){
 	}
 	if(c){
 		if(argv[3]){
-			createArchive(argv[3], file);
+			if (strlen(argv[3]) > PATH_MAX){
+				perror("Path is too long");
+				exit(EXIT_FAILURE);
+			}
+			createArchive(argv[3], file, v, S);
 		}
 		else{
 	        perror("No path provided");	
 		}
-		/*write archive*/
-		if(v){
-			/*print to terminal as writing to archive*/
-		}
 	}
 	else if(t){
 		if(argv[3]){
-			/*list contents of given archive*/
-			createTable(argv[3], file);
+			/*list contents of given paths*/
+			for (i = 3; i < argc; i++){
+				if (strlen(argv[i]) > PATH_MAX){
+					perror("path is too long");
+				}
+				pathNames[i - 3] = (char *)malloc(PATH_MAX + 1);
+				if (pathNames[i - 3] == NULL) {
+					perror("Null pointer");
+					for (j = 0; j < i - 3; j++) {
+						free(pathNames[j]);
+					}
+					exit(EXIT_FAILURE);
+				}
+        		strcpy(pathNames[i - 3], argv[i]);
+			}
+			createTable(pathNames, file, argc - 3, v, S);
 		}
 		else{
 			/*list all files in archive*/
-			if(getcwd(path, PATH_MAX) != NULL){
-				createTable(path, file);
-			}
-			else{
-				perror("path not found");
-			}
-		}
-		/*print to terminal in createTable?*/
-		if(v){
-			/*print expanded info to terminal*/
-		}
-		else{
-			/*print basic info to terminal*/
+			createTable(emptyList, file, argc - 3, v, S);
 		}
 	}
 	else if(x){
 		if(argv[3]){
-			/*extract given path from archive*/
-			if(v){
-			/*print to terminal as extracting from archive*/
+			/*extract given paths from archive*/
+			for (i = 3; i < argc; i++){
+				if (strlen(argv[i]) > PATH_MAX){
+					perror("path is too long");
+				}
+				pathNames[i - 3] = (char *)malloc(PATH_MAX + 1);
+				if (pathNames[i - 3] == NULL) {
+					perror("Null pointer");
+					for (j = 0; j < i - 3; j++) {
+						free(pathNames[j]);
+					}
+					exit(EXIT_FAILURE);
+				}
+        		strcpy(pathNames[i - 3], argv[i]);
 			}
+			extractArchive(pathNames, file, argc - 3, v, S);
 		}
 		else{
 			/*extract all files from archive*/
-			if(v){
-			/*print to terminal as extracting from archive*/
-			}
+			extractArchive(emptyList, file, 0, v, S);
 		}
 	}
+    for (i = 0; i < argc - 3 && i < PATH_MAX; i++) {
+        free(pathNames[i]);
+    }
 	close(file);
 	return(0);
 }
