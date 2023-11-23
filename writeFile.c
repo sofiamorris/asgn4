@@ -21,7 +21,7 @@ void writeFile(char *path, int file, int v, int S){
         }
         size+=bytesRead;
     }
-    if (lseek(fd, -bytesRead, SEEK_CUR) == -1){
+    if (lseek(fd, 0, SEEK_SET) == -1){
         perror("lseek error");
         return;
     }

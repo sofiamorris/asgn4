@@ -12,7 +12,7 @@ void writeDir(char *path, int file, int v, int S){
     }
     /*write header for directory*/
     h = makeHeader(path, dirStat, '5', "", 0, S);
-    if (write(file, &h, BLOCK_SIZE)){
+    if (write(file, &h, BLOCK_SIZE) == -1){
         perror("cannot write header");
     }
     if((dir = opendir(path)) == NULL){

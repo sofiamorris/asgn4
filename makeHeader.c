@@ -124,7 +124,7 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
 
 /*size*/
     snprintf(sizeStr, sizeof(sizeStr), "%o", size);
-    strcpy(header_st.size, size);
+    strcpy(header_st.size, sizeStr);
 
 /*mtime*/
 

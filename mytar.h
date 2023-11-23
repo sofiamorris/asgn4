@@ -58,7 +58,7 @@
 #define ALLMODE 777
 
 typedef struct __attribute__ ((__packed__)) header_st{
-	char name[101];
+	char name[100];
 	char mode[8];
 	char uid[8];
 	char gid[8];
@@ -78,7 +78,7 @@ typedef struct __attribute__ ((__packed__)) header_st{
 }header;
 
 int main(int argc, char *argv[]);
-void createArchive(char *path, int file, int v, int S);
+void createArchive(char *pathNames[], int file, int argc,  int v, int S);
 void writeDir(char *path, int file, int v, int S);
 void writeFile(char *path, int file, int v, int S);
 void writeSym(char *path, int file, int v, int S);
