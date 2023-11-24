@@ -19,7 +19,7 @@ size_t fillZeros(int fileSize, char *filePtr)
         {
             return fileSize;
         }
-    padding = BLOCK_SIZE % (BLOCK_SIZE - fileSize);
+    padding = BLOCK_SIZE - fileSize;
     for (i = 0; i < padding; i++)
     {
         filePtr[fileSize + i] = '\0';
