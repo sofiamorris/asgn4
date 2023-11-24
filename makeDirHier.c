@@ -3,6 +3,7 @@
 void makeDirHier(char *path){
     char *token;
     char *currentPath;
+    char temp[PATH_MAX];
     DIR *dir;
 
     /*split path up by "/" and check if paths exist*/
@@ -12,17 +13,17 @@ void makeDirHier(char *path){
         exit(EXIT_FAILURE);
     }
     currentPath = token;
-    token = strtok(NULL, "/");
     while(token != NULL){
         /*if path does not exist, make directory and get next path*/
         if((dir = opendir(currentPath)) == NULL){
-            mkdir(currentPath, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP\
-             | S_IROTH | S_IWOTH | S_IXUSR | S_IXGRP | S_IXOTH);
-            snprintf(currentPath, PATH_MAX, "%s/%s", currentPath, token);
             if ((token = strtok(NULL, "/")) == NULL){
                 perror("Path does not exist");
                 exit(EXIT_FAILURE);
             };
+            mkdir(currentPath, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP\
+             | S_IROTH | S_IWOTH | S_IXUSR | S_IXGRP | S_IXOTH);
+            strncpy(temp, currentPath, PATH_MAX);
+            snprintf(currentPath, PATH_MAX, "%s/%s", temp, token);
         }
         else{
             return;

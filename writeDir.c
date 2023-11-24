@@ -14,9 +14,14 @@ void writeDir(char *path, int file, int v, int S){
     h = makeHeader(path, dirStat, '5', "", 0, S);
     if (write(file, &h, BLOCK_SIZE) == -1){
         perror("cannot write header");
+        exit(EXIT_FAILURE);
+    }
+    if(v){
+        printf("%s\n", path);
     }
     if((dir = opendir(path)) == NULL){
         perror("can't open directory");
+        exit(EXIT_FAILURE);
     }
     else{
         /*iterate through objects coming out of directory*/

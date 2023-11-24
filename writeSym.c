@@ -29,6 +29,9 @@ void writeSym(char *path, int file, int v, int S){
             perror("cannot write header");
         }
     }
+    if(v){
+        printf("%s\n", path);
+    }
     free(newPath);
     return;
 }
