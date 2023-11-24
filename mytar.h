@@ -93,3 +93,5 @@ size_t fillZeros(int fileSize, char *filePtr);
 header makeHeader(char name[], struct stat fileStat,\
 char typeflag, const char * symlink, int size, int S);
 header extractHeader(char *extractedHeader);
+ssize_t readlink(const char *path, char *buf, size_t bufsiz);
+int symlink(const char *target, const char *linkpath);
