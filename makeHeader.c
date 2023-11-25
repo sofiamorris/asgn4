@@ -1,4 +1,6 @@
 #include "mytar.h"
+#define FULLPERMS 0777
+#define CHKSUM 256
 
 /* makeHeader expects the caller to input a string 
    array,(1) representing the name of the archived file
@@ -103,38 +105,36 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     }
 
 /*mode*/
-   
-    if(mode & (S_IXUSR | S_IXGRP | S_IXOTH))   
-    /* if anyone has execute permissions, grant to all*/
-        {
-            mode |= (S_IXUSR | S_IXGRP | S_IXOTH);
-        }
-    snprintf(modeStr, sizeof(modeStr), "%o", mode);
+    int permissions = mode & FULLPERMS;  
+    snprintf(modeStr, HD_MODE, "%07o", permissions);
     strcpy(header_st.mode, modeStr);
 
 /*uid*/
-
-    snprintf(uidStr, sizeof(uidStr), "%o", uid);
-    strcpy(header_st.uid, uidStr);
+    insert_special_int(header_st.uid, (size_t)HD_UID, uid); 
 
 /*gid*/
 
-    snprintf(gidStr, sizeof(gidStr), "%o", gid);
+    snprintf(gidStr, sizeof(gidStr), "%07o", gid);
     strcpy(header_st.gid, gidStr);
 
 /*size*/
-    snprintf(sizeStr, sizeof(sizeStr), "%o", size);
+    snprintf(sizeStr, sizeof(sizeStr), "%011o", size);
     strcpy(header_st.size, sizeStr);
 
 /*mtime*/
 
-    snprintf(mtimeStr, sizeof(mtimeStr), "%ld", (long)mtime);
+    snprintf(mtimeStr, sizeof(mtimeStr), "%011lo", (unsigned long)mtime);
     strcpy(header_st.mtime, mtimeStr);
 
 /*typeflag*/
-
-    snprintf(typeflagStr, sizeof(typeflagStr), "%o", typeflag);
-    strcpy(header_st.typeflag, typeflagStr);
+    
+    if (typeflag == '0'){
+        strcpy(header_st.typeflag, "0");
+    }
+    else{
+        snprintf(typeflagStr, sizeof(typeflagStr), "%o", typeflag);
+        strcpy(header_st.typeflag, typeflagStr);
+    }
 
 /*linkname*/
 
@@ -165,8 +165,7 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     
     else
         {
-            header_st.linkname[HD_LINKNAME - 1] = '\0';
-            strncpy(header_st.linkname, symlink, HD_LINKNAME);
+            /*do nothing*/
         }
 
 /*magic*/
@@ -204,8 +203,8 @@ header_st.padding[i] = '\0';
         {
             sum += bytes[j];
         }
-
-    snprintf(chksumStr, sizeof(header_st.chksum), "%o", sum);
+    sum += CHKSUM;
+    snprintf(chksumStr, sizeof(header_st.chksum), "%07o", sum);
     strcpy(header_st.chksum, chksumStr);
 
 

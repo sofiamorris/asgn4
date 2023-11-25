@@ -9,19 +9,20 @@ void writeDir(char *path, int file, int v, int S){
 
     if(stat(path, &dirStat) == -1){
         perror("error stating dir");
+        return;
     }
     /*write header for directory*/
     h = makeHeader(path, dirStat, '5', "", 0, S);
     if (write(file, &h, BLOCK_SIZE) == -1){
         perror("cannot write header");
-        exit(EXIT_FAILURE);
+        return;
     }
     if(v){
         printf("%s\n", path);
     }
     if((dir = opendir(path)) == NULL){
         perror("can't open directory");
-        exit(EXIT_FAILURE);
+        return;
     }
     else{
         /*iterate through objects coming out of directory*/
@@ -44,8 +45,7 @@ void writeDir(char *path, int file, int v, int S){
                     writeSym(currentPath, file, v, S);
                 }
                 else{
-                    makeDirHier(currentPath);
-                    writeDir(currentPath, file, v, S);
+                    return;
                 }
             }
         }
