@@ -18,7 +18,7 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
     char typeFlag[HD_TYPEFLAG + 1];
 
     /*check if any paths were entered in command line*/
-    if(pathNames == NULL){
+    if(pathNames[0] == NULL){
         while(1){
             /*read bytes into header array*/
             bytesRead = read(file, extractedHeader, BLOCK_SIZE);
@@ -130,7 +130,8 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /*read SIZE and increase i accordingly*/
-            i = BLOCK_SIZE * (intSize / BLOCK_SIZE);
+            i = BLOCK_SIZE *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
+            i += BLOCK_SIZE;          /*Account for header size */
             lseek(file, i, SEEK_CUR);
         }
     }
@@ -264,8 +265,9 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /*read SIZE and increase i accordingly*/
-            i = BLOCK_SIZE * (intSize / BLOCK_SIZE);
-            lseek(file, i, SEEK_CUR);
+            i = BLOCK_SIZE *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
+            i += BLOCK_SIZE;          /*Account for header size */
+             lseek(file, i, SEEK_CUR);
         }
     }
     return;
