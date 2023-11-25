@@ -15,7 +15,7 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
     int pathIt, numBlocks;
     mode_t perms = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
     
-    if (pathNames == NULL){
+    if (pathNames[0] == NULL){
         while(1){
             /*read bytes into header array*/
             bytesRead = read(file, extractedHeader, BLOCK_SIZE);
@@ -72,23 +72,11 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /* fill fullName combining offsets of name and prefix*/
-            for(off = OFF_NAME; off < HD_NAME; off++){
-            if(extractedHeader[off] == '\0'){
-                break;
-                }
-                fullName[byte] = extractedHeader[off];
-                byte++;
+            strcpy(fullName, h.name);
+            if (h.prefix[0] != '\0'){
+                strcat(fullName,"/");
+                strcat(fullName, h.prefix);
             }
-            fullName[byte] = '/';
-            byte++;
-            for(off = OFF_PREFIX; off < HD_PREFIX; off++){
-                if(extractedHeader[off] == '\0'){
-                    break;
-                }
-                fullName[byte] = extractedHeader[off];
-                byte++;
-            }
-            byte = 0;   
             /*check type, if directory, then create directory*/
             if (extractedHeader[OFF_TYPEFLAG] == '5'){
                 perms = perms | (S_IXUSR | S_IXGRP | S_IXOTH);
@@ -175,23 +163,11 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /* fill fullName combining offsets of name and prefix*/
-            for(off = OFF_NAME; off < HD_NAME; off++){
-            if(extractedHeader[off] == '\0'){
-                break;
-                }
-                fullName[byte] = extractedHeader[off];
-                byte++;
-            }
-            fullName[byte] = '/';
-            byte++;
-            for(off = OFF_PREFIX; off < HD_PREFIX; off++){
-                if(extractedHeader[off] == '\0'){
-                    break;
-                }
-                fullName[byte] = extractedHeader[off];
-                byte++;
-            }
-            byte = 0;
+            strcpy(fullName, h.name);                                 
+            if (h.prefix[0] != '\0'){                                 
+                 strcat(fullName,"/");                                 
+                 strcat(fullName, h.prefix);                           
+             }  
             /*iterate through list of pathNames and check if path is reached*/
             for(pathIt = 0; pathIt < argc; pathIt++){
                 if (strcmp(fullName, pathNames[pathIt]) == 0){
