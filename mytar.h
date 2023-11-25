@@ -93,3 +93,4 @@ size_t fillZeros(int fileSize, char *filePtr);
 header makeHeader(char name[], struct stat fileStat,\
 char typeflag, const char * symlink, int size, int S);
 header extractHeader(char *extractedHeader);
+int insert_special_int(char *where, size_t size, int32_t val);

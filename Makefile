@@ -3,12 +3,14 @@ CFLAGS = -g -Wall -std=c99 -pedantic
 
 all: mytar
 
-mytar: createArchive.o createTable.o extractArchive.o extractDir.o extractFile.o extractHeader.o extractSymLink.o fillZeros.o makeDirHier.o makeHeader.o mytar.o writeDir.o writeFile.o writeSym.o
-	$(CC) $(CFLAGS) -o mytar createArchive.o createTable.o extractArchive.o extractDir.o extractFile.o extractHeader.o extractSymLink.o fillZeros.o makeDirHier.o makeHeader.o mytar.o writeDir.o writeFile.o writeSym.o
+mytar: createArchive.o createTable.o extractArchive.o extractDir.o extractFile.o extractHeader.o extractSymLink.o fillZeros.o makeDirHier.o makeHeader.o mytar.o writeDir.o writeFile.o writeSym.o insert_special_int.o
+	$(CC) $(CFLAGS) -o mytar createArchive.o createTable.o extractArchive.o extractDir.o extractFile.o extractHeader.o extractSymLink.o fillZeros.o makeDirHier.o makeHeader.o mytar.o writeDir.o writeFile.o writeSym.o insert_special_int.o
 
 mytar.o: mytar.c mytar.h
 	$(CC) -c -o mytar.o mytar.c $(CFLAGS)
 
+insert_special_int.o: insert_special_int.c mytar.h
+	$(CC) -c -o insert_special_int.o insert_special_int.c $(CFLAGS)
 createArchive.o: createArchive.c mytar.h
 	$(CC) -c -o createArchive.o createArchive.c $(CFLAGS)
 
