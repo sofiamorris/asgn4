@@ -142,7 +142,9 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /*read SIZE and increase i accordingly*/
-            i = BLOCK_SIZE * (intSize / BLOCK_SIZE);
+            i = BLOCK_SIZE *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
+            i += BLOCK_SIZE;          /*Account for header size */
+            printf("offset(1): %d\n", i);
             lseek(file, i, SEEK_CUR);
         }
     }
@@ -161,8 +163,8 @@ printf("bytesRead: %zd  BLOCK_SIZE: %d\n", bytesRead, BLOCK_SIZE);
 int ustarCheck = strncmp(extractedHeader + 257, "ustar", 5);
 printf("strncmp: %d\n", ustarCheck);
 
-for (int i = 0; i < 10; ++i) {
-    printf("Char at %d: %c (ASCII: %d)\n", i + 257, extractedHeader[i + 257], extractedHeader[i + 257]);
+for (int i = 0; i < 512; ++i) {
+    printf("Char at %d: %c (ASCII: %d)\n", i, extractedHeader[i], extractedHeader[i]);
 }
 
 if (ustarCheck != 0) {
@@ -308,7 +310,9 @@ printf("Debug: Header information - magic: %s, version: %s\n", h.magic, h.versio
                 exit(EXIT_FAILURE);
             }
             /*read SIZE and increase i accordingly*/
-            i = BLOCK_SIZE * (intSize / BLOCK_SIZE);
+     i = BLOCK_SIZE *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
+              i += BLOCK_SIZE;          /*Account for header size */
+printf("offset(2): %d\n", i);
             lseek(file, i, SEEK_CUR);
         }
     }
