@@ -12,7 +12,6 @@ void extractFile(char *name, int blocks,\
     int extractedFile, numBlocks;
     ssize_t bytesRead;
     struct utimbuf times;
-    char stringFile[PATH_MAX];
     int timesRead = 0;
 
     /*open new file and give it calculated perms*/
@@ -32,10 +31,10 @@ void extractFile(char *name, int blocks,\
             perror("cannot write to extracted file");
             exit(EXIT_FAILURE);
         }
+        timesRead++;
     }
-    sprintf(stringFile, "%d", extractedFile);
     times.modtime = mtime;
-    if (utime(stringFile, &times) == -1) {
+    if (utime(name, &times) == -1) {
         perror("error setting mtime");
         exit(EXIT_FAILURE);
     }

@@ -114,26 +114,27 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                     perror("cannot read header");
                     exit(EXIT_FAILURE);
             }
-            if (bytesRead == BLOCK_SIZE\
-                && strncmp(extractedHeader + 257, "ustar", 5) == 0) {
-                /*nothing*/
-            } else {
-                close(file);
-                perror("file not valid");
-                exit(EXIT_FAILURE);
+            if (extractedHeader[0] != '\0'){
+                if (bytesRead == BLOCK_SIZE\
+                    && strncmp(extractedHeader + 257, "ustar", 5) == 0) {
+                    /*nothing*/
+                } else {
+                    close(file);
+                    perror("file not valid");
+                    exit(EXIT_FAILURE);
+                }
+                if (S){
+                    if ((h.magic)[HD_MAGIC - 1]!='\0'||strcmp(h.version,"00")!=0){
+                        return;
+                    }
+                }
+                else{
+                    if (memcmp(h.magic, "ustar", 5) != 0){
+                        return;
+                    }
+                }
             }
             h = extractHeader(extractedHeader);
-            /*check for S*/
-            if (S){
-                if ((h.magic)[HD_MAGIC - 1]!='\0'||strcmp(h.version,"00")!=0){
-                    return;
-                }
-            }
-            else{
-                if (memcmp(h.magic, "ustar", 5) != 0){
-                    return;
-                }
-            }
             /*convert strings to ints*/
             intChksum = strtol(h.chksum, &endptr, 8);
             if (*endptr != '\0'){
