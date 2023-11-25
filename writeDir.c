@@ -18,7 +18,7 @@ void writeDir(char *path, int file, int v, int S){
         return;
     }
     if(v){
-        printf("%s\n", path);
+        printf("%s/\n", path);
     }
     if((dir = opendir(path)) == NULL){
         perror("can't open directory");

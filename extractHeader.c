@@ -6,7 +6,8 @@ header extractHeader(char *extractedHeader){
     char size[HD_SIZE], mtime[HD_MTIME], linkname[HD_LINKNAME];
     char magic[HD_MAGIC], version[HD_VERSION], uname[HD_UNAME];
     char gname[HD_GNAME], devmajor[HD_DEVMAJOR], devminor[HD_DEVMINOR];
-    u_int8_t byte = 0, off;
+    u_int8_t byte = 0;
+    unsigned int  off;
     header h = {
     .name = {0},
     .mode = {0},
@@ -34,6 +35,7 @@ header extractHeader(char *extractedHeader){
         byte++;
     }
     strcpy(h.name, name);
+    byte = 0;
     /*get permissions*/
     for(off = (unsigned char)OFF_MODE;\
         off < (unsigned char)(OFF_MODE + HD_MODE); off++){
@@ -91,64 +93,64 @@ header extractHeader(char *extractedHeader){
     strcpy(h.typeflag, typeflag);
     byte = 0;
     /*get linkname*/
-    for(off = (unsigned char)OFF_LINKNAME;\
-        off < (unsigned char)(OFF_LINKNAME + HD_LINKNAME); off++){
+    for(off = (unsigned int)OFF_LINKNAME;\
+         off < (unsigned int)(OFF_LINKNAME + HD_LINKNAME); off++){
         linkname[byte] = extractedHeader[off];
         byte++;
     }
     strcpy(h.linkname, linkname);
     byte = 0;
     /*get magic*/
-    for(off = (unsigned char)OFF_MAGIC;\
-        off < (unsigned char)(OFF_MAGIC + HD_MAGIC); off++){
+    for(off = (unsigned int)OFF_MAGIC;\
+        off < (unsigned int)(OFF_MAGIC + HD_MAGIC); off++){
         magic[byte] = extractedHeader[off];
         byte++;
     }
     strcpy(h.magic, magic);
     byte = 0;
     /*get version*/
-    for(off = (unsigned char)OFF_VERSION;\
-        off < (unsigned char)(OFF_VERSION + HD_VERSION); off++){
+    for(off = (unsigned int)OFF_VERSION;\
+        off < (unsigned int)(OFF_VERSION + HD_VERSION); off++){
         version[byte] = extractedHeader[off];
         byte++;
     }
     strcpy(h.version, version);
     byte = 0;
     /*get uname*/
-    for(off = (unsigned char)OFF_UNAME;\
-        off < (unsigned char)(OFF_UNAME + HD_UNAME); off++){
+    for(off = (unsigned int)OFF_UNAME;\
+        off < (unsigned int)(OFF_UNAME + HD_UNAME); off++){
         uname[byte] = extractedHeader[off];
         byte++;
     }
     strcpy(h.uname, uname);
     byte = 0;
     /*get gname*/
-    for(off = (unsigned char)OFF_GNAME;\
-        off < (unsigned char)(OFF_GNAME + HD_GNAME); off++){
+    for(off = (unsigned int)OFF_GNAME;\
+        off < (unsigned int)(OFF_GNAME + HD_GNAME); off++){
         gname[byte] = extractedHeader[off];
         byte++;
     }
     strcpy(h.gname, gname);
     byte = 0;
     /*get devmajor*/
-    for(off = (unsigned char)OFF_DEVMAJOR;\
-        off < (unsigned char)(OFF_DEVMAJOR + HD_DEVMAJOR); off++){
+    for(off = (unsigned int)OFF_DEVMAJOR;\
+        off < (unsigned int)(OFF_DEVMAJOR + HD_DEVMAJOR); off++){
         devmajor[byte] = extractedHeader[off];
         byte++;
     }
     strcpy(h.devmajor, devmajor);
     byte = 0;
     /*get devminor*/
-    for(off = (unsigned char)OFF_DEVMINOR;\
-        off < (unsigned char)(OFF_DEVMINOR + HD_DEVMINOR); off++){
+    for(off = (unsigned int)OFF_DEVMINOR;\
+        off < (unsigned int)(OFF_DEVMINOR + HD_DEVMINOR); off++){
         devminor[byte] = extractedHeader[off];
         byte++;
     }
     strcpy(h.devminor, devminor);
     byte = 0;
     /*get prefix*/
-    for(off = (unsigned char)OFF_PREFIX;\
-        off < (unsigned char)(OFF_PREFIX + HD_PREFIX); off++){
+    for(off = (unsigned int)OFF_PREFIX;\
+        off < (unsigned int)(OFF_PREFIX + HD_PREFIX); off++){
         prefix[byte] = extractedHeader[off];
         byte++;
     }

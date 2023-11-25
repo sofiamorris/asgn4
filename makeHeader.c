@@ -25,20 +25,16 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     uid_t uid = fileStat.st_uid;
     gid_t gid = fileStat.st_gid;
     time_t mtime = fileStat.st_mtime;
-    dev_t device = fileStat.st_dev;
 
     if(name[0] == '\0')
         {
             perror("makeHeader: Empty file name");
         }
     char modeStr[HD_MODE] = {'\0'};
-    char uidStr[HD_UID] = {'\0'};
     char gidStr[HD_GID] = {'\0'};
     char sizeStr[HD_SIZE] = {'\0'};
     char mtimeStr[HD_MTIME] = {'\0'};
     char chksumStr[HD_CHKSUM] = {'\0'};
-    char typeflagStr[HD_TYPEFLAG] = {'\0'};
-    char linknameStr[HD_LINKNAME] = {'\0'};
 
     header header_st = {
     .name = {0},
@@ -69,6 +65,9 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
     else if (strlen(name) < HD_NAME) {
         strncpy(header_st.name, name, HD_NAME - 1);
         header_st.name[HD_NAME - 1] = '\0';
+        if (typeflag == '5'){
+            strcat(header_st.name, "/");
+        }
         header_st.prefix[0] = '\0';
     } else {
         int lastSlash = -1;
@@ -99,6 +98,10 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
         if (prefixLength > 0) {
             strncpy(header_st.prefix, name + lastSlash + 1, prefixLength);
             header_st.prefix[prefixLength] = '\0';
+            if (typeflag == '5'){
+                strncat(header_st.prefix, "/",\
+                     sizeof(header_st.prefix) - prefixLength - 1);
+            }
         } else {
             header_st.prefix[0] = '\0';
         }
@@ -128,12 +131,14 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
 
 /*typeflag*/
     
-    if (typeflag == '0'){
+    if (typeflag == '0' || typeflag == '\0'){
         strcpy(header_st.typeflag, "0");
     }
+    else if (typeflag == '5'){
+        strcpy(header_st.typeflag, "5");                              
+    }
     else{
-        snprintf(typeflagStr, sizeof(typeflagStr), "%o", typeflag);
-        strcpy(header_st.typeflag, typeflagStr);
+        strcpy(header_st.typeflag, "0");                              
     }
 
 /*linkname*/
@@ -199,10 +204,9 @@ header_st.padding[i] = '\0';
 
     unsigned char *bytes = (unsigned char *) &header_st;
     unsigned int sum = 0;
-    for (size_t j = 0; j < sizeof(header_st); j++)
-        {
-            sum += bytes[j];
-        }
+    for (size_t j = 0; j < sizeof(header_st); j++) {
+        sum += bytes[j];
+    }
     sum += CHKSUM;
     snprintf(chksumStr, sizeof(header_st.chksum), "%07o", sum);
     strcpy(header_st.chksum, chksumStr);

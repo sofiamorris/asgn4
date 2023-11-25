@@ -11,6 +11,7 @@ mytar.o: mytar.c mytar.h
 
 insert_special_int.o: insert_special_int.c mytar.h
 	$(CC) -c -o insert_special_int.o insert_special_int.c $(CFLAGS)
+
 createArchive.o: createArchive.c mytar.h
 	$(CC) -c -o createArchive.o createArchive.c $(CFLAGS)
 
@@ -51,4 +52,4 @@ writeSym.o: writeSym.c mytar.h
 	$(CC) -c -o writeSym.o writeSym.c $(CFLAGS)
 
 clean:
-	rm *.o core* mytar
+	rm -f *.o mytar

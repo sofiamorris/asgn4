@@ -5,7 +5,6 @@ void writeFile(char *path, int file, int v, int S){
     ssize_t bytesRead;
     char buffer[BLOCK_SIZE];
     char buf[BLOCK_SIZE];
-    char *endptr;
     int size = 0;
     header h;
     struct stat fileStat;
