@@ -10,7 +10,10 @@
 void extractDir(char *name, mode_t perms, time_t mtime, int v){
     struct utimbuf times;
     char command[SYSTEMCALL + PATH_MAX];
-    
+    char copy[PATH_MAX];
+
+    strcpy(copy,name); 
+    makeDirHier(copy);    
     if (access(name, F_OK) != -1) {
         snprintf(command, sizeof(command), "rm -r %s", name);
         if (system(command) == -1){

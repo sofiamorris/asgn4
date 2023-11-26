@@ -1,6 +1,6 @@
+#include <string.h>                                                   
 #include "mytar.h"
 #include <stdio.h>
-#include <string.h>
 #include <stdint.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
@@ -13,7 +13,10 @@ void extractFile(char *name, int blocks,\
     ssize_t bytesRead;
     struct utimbuf times;
     int timesRead = 0;
+    char copy[PATH_MAX];
 
+    strcpy(copy,name); 
+    makeDirHier(copy);
     /*open new file and give it calculated perms*/
     if((extractedFile = open(name,O_WRONLY | O_CREAT | O_TRUNC, perms))==-1){
         perror("unable to create new file");

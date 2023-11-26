@@ -17,9 +17,8 @@ void makeDirHier(char *path){
         /*if path does not exist, make directory and get next path*/
         if((dir = opendir(currentPath)) == NULL){
             if ((token = strtok(NULL, "/")) == NULL){
-                perror("Path does not exist");
-                exit(EXIT_FAILURE);
-            };
+                return;
+            }
             mkdir(currentPath, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP\
              | S_IROTH | S_IWOTH | S_IXUSR | S_IXGRP | S_IXOTH);
             strncpy(temp, currentPath, PATH_MAX);
