@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>
 #include "mytar.h"
 
 void createArchive(char *pathNames[], int file, int argc, int v, int S){

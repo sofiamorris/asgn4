@@ -6,7 +6,7 @@
 #include <sys/fcntl.h>
 #include <utime.h>
 
-void extractSymLink(char *name, char *linkname, time_t mtime){
+void extractSymLink(char *name, char *linkname, time_t mtime, int v){
     struct utimbuf times;
 
     if (symlink(name, linkname) == -1){
@@ -18,6 +18,8 @@ void extractSymLink(char *name, char *linkname, time_t mtime){
         perror("error setting mtime");
         exit(EXIT_FAILURE);
     }
-    printf("%s\n", name);
+    if (v){
+        printf("%s\n", name);
+    }
     return;
 }

@@ -85,9 +85,9 @@ void writeSym(char *path, int file, int v, int S);
 void createTable(char *pathNames[], int file, int argc, int v, int S);
 void extractArchive(char *pathNames[], int file, int argc, int v, int S);
 void extractFile(char *name, int blocks,\
- mode_t perms, int file, time_t mtime, int size);
-void extractDir(char *name, mode_t perms, time_t mtime);
-void extractSymLink(char *name, char *linkname, time_t mtime);
+ mode_t perms, int file, time_t mtime, int size, int v);
+void extractDir(char *name, mode_t perms, time_t mtime, int v);
+void extractSymLink(char *name, char *linkname, time_t mtime, int v);
 void makeDirHier(char *path);
 size_t fillZeros(int fileSize, char *filePtr);
 header makeHeader(char name[], struct stat fileStat,\

@@ -6,7 +6,7 @@
 #include <sys/fcntl.h>
 #include <utime.h>
 
-void extractDir(char *name, mode_t perms, time_t mtime){
+void extractDir(char *name, mode_t perms, time_t mtime, int v){
     struct utimbuf times;
 
     if (mkdir(name, perms) == -1){
@@ -18,6 +18,8 @@ void extractDir(char *name, mode_t perms, time_t mtime){
         perror("error setting mtime");
         exit(EXIT_FAILURE);
     }
-    printf("%s\n", name);
+    if (v){
+        printf("%s\n", name);
+    }
     return;
 }

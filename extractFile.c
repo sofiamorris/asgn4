@@ -7,7 +7,7 @@
 #include <utime.h>
 
 void extractFile(char *name, int blocks,\
- mode_t perms, int file, time_t mtime, int size){
+ mode_t perms, int file, time_t mtime, int size, int v){
     char dataBlock[BLOCK_SIZE];
     int extractedFile, numBlocks;
     ssize_t bytesRead;
@@ -21,24 +21,34 @@ void extractFile(char *name, int blocks,\
     }
     numBlocks = (size / BLOCK_SIZE);
     /*write data to new file*/
-    while ((bytesRead = read(file, dataBlock, BLOCK_SIZE)) > 0\
-     && timesRead <= numBlocks ){
+    while ((bytesRead = read(file, dataBlock, BLOCK_SIZE)) > 0){
         if (bytesRead == -1){
                 perror("cannot read file");
                 exit(EXIT_FAILURE);
+        }
+        if (size < BLOCK_SIZE){
+            bytesRead = size;
+        }
+        else{
+            size = size - bytesRead;
         }
         if (write(extractedFile, dataBlock, bytesRead) == -1){
             perror("cannot write to extracted file");
             exit(EXIT_FAILURE);
         }
         timesRead++;
+        if (timesRead > numBlocks){
+            break;
+        }
     }
     times.modtime = mtime;
     if (utime(name, &times) == -1) {
         perror("error setting mtime");
         exit(EXIT_FAILURE);
     }
-    printf("%s\n", name);
+    if (v){
+        printf("%s\n", name);
+    }
     close(extractedFile);
     return;
 }
