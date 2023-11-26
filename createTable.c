@@ -105,13 +105,13 @@ printf("strcmp: %d\n", strncmp(extractedHeader + 257, "ustar", 5));
  *                 owner/group, size, and Mtime using offsets*/
                 if(h.uname[0] == '\0' || h.gname[0] == '\0'){
                     /*use uid and gid if symbolic names unavailable*/
-                    printf("%s%s %s/%s %s %s %s\n", typeFlag,\
-                    permString, h.uid, h.gid, h.size, h.mtime, fullName);
+                    printf("%s%s %s/%s %d %s %s\n", typeFlag,\
+                    permString, h.uid, h.gid, intSize, h.mtime, fullName);
                 }
                 else{
                     /*use uname and gname*/
-                    printf("%s%s %s/%s %s %s %s\n", typeFlag,\
-                    permString, h.uname, h.gname, h.size, h.mtime, fullName);
+                    printf("%s%s %s/%s %d %s %s\n", typeFlag,\
+                    permString, h.uname, h.gname, intSize, h.mtime, fullName);
                 }
             }
             else{
@@ -221,15 +221,15 @@ printf("bytesRead(2): %zd\n", bytesRead);
  *                         owner/group, size, and Mtime using offsets*/
                         if(h.uname[0] == '\0' || h.gname[0] == '\0'){
                             /*use uid and gid if symbolic names unavailable*/
-                            printf("%s%s %s/%s %s %s %s\n", typeFlag,\
+                            printf("%s%s %s/%s %d %s %s\n", typeFlag,\
                              permString, h.uid, h.gid,\
-                              h.size, h.mtime, fullName);
+                              intSize, h.mtime, fullName);
                         }
                         else{
                             /*use uname and gname*/
-                            printf("%s%s %s/%s %s %s %s\n", typeFlag,\
+                            printf("%s%s %s/%s %d %s %s\n", typeFlag,\
                             permString, h.uname, h.gname,\
-                             h.size, h.mtime, fullName);
+                             intSize, h.mtime, fullName);
                         }
                     }
                     else{
