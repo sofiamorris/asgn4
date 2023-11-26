@@ -5,9 +5,10 @@ void writeSym(char *path, int file, int v, int S){
     ssize_t size, bytes;
     char *newPath;
     struct stat fileStat;
+    char symPath[PATH_MAX];
 
     /*get size of symlink*/
-    if ((size = readlink(path, NULL, 0)) == -1){
+    if ((size = readlink(path, symPath, PATH_MAX)) == -1){
         perror("error with symbolic link size");
         exit(EXIT_FAILURE);
     }

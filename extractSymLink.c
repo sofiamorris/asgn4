@@ -14,7 +14,7 @@ void extractSymLink(char *name, char *linkname, time_t mtime, int v){
         exit(EXIT_FAILURE);
     }
     times.modtime = mtime;
-    if (utime(name, &times) == -1) {
+    if (utime(linkname, &times) == -1) {
         perror("error setting mtime");
         exit(EXIT_FAILURE);
     }

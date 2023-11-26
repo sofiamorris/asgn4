@@ -68,10 +68,13 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /* fill fullName combining offsets of name and prefix*/
-            strcpy(fullName, h.name);
-            if (h.prefix[0] != '\0'){
-                strcat(fullName,"/");
-                strcat(fullName, h.prefix);
+            if (h.prefix[0] != '\0'){                                 
+                 strcpy(fullName,h.prefix);                                 
+                 strcat(fullName,"/");                                 
+                 strcat(fullName, h.name);
+            }
+            else{ 
+                strcpy(fullName, h.name);
             }
             /*check type, if directory, then create directory*/
             if (extractedHeader[OFF_TYPEFLAG] == '5'){
@@ -141,6 +144,9 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                 }
                 continue;
             }
+            else{
+                nullBlocks = 0;
+            }
             /* convert strings to ints*/
             intSize = strtol(h.size, &endptr, 8);
             if (*endptr != '\0'){
@@ -158,11 +164,17 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /* fill fullName combining offsets of name and prefix*/
-            strcpy(fullName, h.name);                                 
             if (h.prefix[0] != '\0'){                                 
+                 strcpy(fullName,h.prefix);                                 
                  strcat(fullName,"/");                                 
-                 strcat(fullName, h.prefix);                           
-             }  
+                 strcat(fullName, h.name);
+            }
+            else{ 
+                strcpy(fullName, h.name);
+            }
+            if (strcmp(h.typeflag, "5") == 0){       
+                fullName[strlen(fullName) - 1] = '\0';                          
+            }
             /*iterate through list of pathNames and check if path is reached*/
             for(pathIt = 0; pathIt < argc; pathIt++){
                 if (strcmp(fullName, pathNames[pathIt]) == 0){
@@ -172,7 +184,7 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                 }
             }
             /*if reachedPath, start extracting directory and descendents*/
-            if(reachedPath){
+            if (reachedPath == 1){
                 /*check if a descendent of directory, else reachedPath = 0*/
                 if(strstr(fullName, parentPath) == NULL){
                     reachedPath = 0;
@@ -209,8 +221,10 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                     }
                 }
             }
-            i = BLOCK_SIZE *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
-            lseek(file, i, SEEK_CUR); 
+            else{
+                i = BLOCK_SIZE *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
+                lseek(file, i, SEEK_CUR); 
+            }
         }
     }
     return;
