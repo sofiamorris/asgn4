@@ -112,14 +112,12 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
     } 
     else{
         while(1){
-            long position = lseek(file, 0, SEEK_CUR);
             /*read bytes into header array*/
             bytesRead = read(file, extractedHeader, BLOCK_SIZE);
             if (bytesRead == -1){
                     perror("cannot read header");
                     exit(EXIT_FAILURE);
             }
-            position = lseek(file, 0, SEEK_CUR);                 
             if (extractedHeader[0] != '\0'){
                 if (bytesRead == BLOCK_SIZE\
                     && strncmp(extractedHeader + 257, "ustar", 5) == 0) {

@@ -143,7 +143,7 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
 
 /*linkname*/
 
-    if (header_st.typeflag == '2')  /*'2' is the typeflag rep
+    if (typeflag == '2')  /*'2' is the typeflag rep
                                     for a symlink*/
         {
             if (symlink != NULL)

@@ -102,7 +102,7 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 if (strcmp(h.typeflag,"5") == 0){
                     typeFlag[0] = 'd';
                 }
-                else if (h.typeflag[0] == '2'){
+                else if (extractedHeader[OFF_TYPEFLAG] == '2'){
                     typeFlag[0] = 'l';
                 }
                 else{
@@ -134,7 +134,8 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 exit(EXIT_FAILURE);
             }
             /*read SIZE and increase i accordingly*/
-            i = BLOCK_SIZE *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
+            i = (int)BLOCK_SIZE *( (intSize + (int)BLOCK_SIZE - 1)\
+                 / (int)BLOCK_SIZE);
             lseek(file, i, SEEK_CUR);
             for (j = 0; j <= PATH_MAX; ++j) {
                 fullName[j] = 0;
@@ -143,21 +144,17 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
     }
     else{
         while(1){
-            long position = lseek(file, 0, SEEK_CUR);
             /*read bytes into header array*/
             bytesRead = read(file, extractedHeader, BLOCK_SIZE);
             if (bytesRead == -1){
                     perror("cannot read header");
                     exit(EXIT_FAILURE);
             }
-            position = lseek(file, 0, SEEK_CUR);
             if (extractedHeader[0] != '\0'){
-                if (bytesRead == BLOCK_SIZE\
-                    && strncmp(extractedHeader + 257, "ustar", 5) == 0) {
-                    /*nothing*/
-                } else {
+                if (bytesRead != BLOCK_SIZE\
+                    || strncmp(extractedHeader + 257, "ustar", 5) != 0) {
                     close(file);
-                    perror("file not valid");
+                    perror("XXfile not valid");
                     exit(EXIT_FAILURE);
                 }
                 h = extractHeader(extractedHeader);                       
@@ -212,9 +209,6 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 /*check if a descendent of directory, else reachedPath = 0*/
                 if(strstr(fullName, parentPath) == NULL){
                     reachedPath = 0;
-                    i = BLOCK_SIZE\
-                         *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
-                    lseek(file, i, SEEK_CUR);
                 }
                 else{
                     if (v){
@@ -244,7 +238,7 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                         if (strcmp(h.typeflag,"5") == 0){
                             typeFlag[0] = 'd';
                         }
-                        else if (h.typeflag[0] == '2'){
+                        else if (extractedHeader[OFF_TYPEFLAG] == '2'){
                             typeFlag[0] = 'l';
                         }
                         else{
@@ -273,11 +267,9 @@ void createTable(char *pathNames[], int file, int argc, int v, int S){
                 }
             }
             /*read SIZE and increase i accordingly*/
-            i = BLOCK_SIZE *( (intSize + BLOCK_SIZE - 1) / BLOCK_SIZE);
+            i = (int)BLOCK_SIZE *( (intSize + (int)BLOCK_SIZE - 1)\
+                 / (int)BLOCK_SIZE);
             lseek(file, i, SEEK_CUR);
-            for (j = 0; j <= PATH_MAX; ++j) {
-                fullName[j] = 0;
-            }
         }
     }
     return;
