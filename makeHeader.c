@@ -71,7 +71,7 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
         header_st.prefix[0] = '\0';
     } else {
         int lastSlash = -1;
-        for (int i = HD_NAME; i >= 0; i--) {
+        for (int i = HD_PREFIX; i >= 0; i--) {
             if (name[i] == '/') {
                 lastSlash = i;
                 break;
@@ -81,29 +81,29 @@ header makeHeader(char name[], struct stat fileStat, char typeflag,\
         int nameLength, prefixLength;
 
         if (lastSlash == -1) {
-            nameLength = HD_NAME - 1;
-            prefixLength = strlen(name) - nameLength;
+            prefixLength = HD_PREFIX - 1;
+            nameLength = strlen(name) - prefixLength;
         } else {
-            nameLength = lastSlash;
-            prefixLength = strlen(name) - lastSlash - 1;
+            prefixLength = lastSlash;
+            nameLength = strlen(name) - lastSlash - 1;
         }
 
 
-        strncpy(header_st.name, name, nameLength);
-        if (nameLength != 0)
+        strncpy(header_st.prefix, name, prefixLength);
+        if (prefixLength != 0)
          {
-             header_st.name[nameLength] = '\0';
+             header_st.prefix[prefixLength] = '\0';
          }
 
-        if (prefixLength > 0) {
-            strncpy(header_st.prefix, name + lastSlash + 1, prefixLength);
-            header_st.prefix[prefixLength] = '\0';
+        if (nameLength > 0) {
+            strncpy(header_st.name, name + lastSlash + 1, nameLength);
+            header_st.name[nameLength] = '\0';
             if (typeflag == '5'){
-                strncat(header_st.prefix, "/",\
-                     sizeof(header_st.prefix) - prefixLength - 1);
+                strncat(header_st.name, "/",\
+                     sizeof(header_st.name) - nameLength - 1);
             }
         } else {
-            header_st.prefix[0] = '\0';
+            header_st.name[0] = '\0';
         }
     }
 
