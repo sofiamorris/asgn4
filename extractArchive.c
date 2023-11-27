@@ -51,6 +51,9 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                 }
                 continue;
             }
+            else{
+                nullBlocks = 0;
+            }
             /* convert strings to ints*/
             intSize = strtol(h.size, &endptr, 8);
             if (*endptr != '\0'){
@@ -72,9 +75,11 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                  strcpy(fullName,h.prefix);                                 
                  strcat(fullName,"/");                                 
                  strcat(fullName, h.name);
+                 fullName[HD_NAME + HD_PREFIX] = '\0';
             }
             else{ 
                 strcpy(fullName, h.name);
+                fullName[HD_NAME] = '\0';
             }
             /*check type, if directory, then create directory*/
             if (extractedHeader[OFF_TYPEFLAG] == '5'){
@@ -168,9 +173,11 @@ void extractArchive(char *pathNames[], int file, int argc, int v, int S){
                  strcpy(fullName,h.prefix);                                 
                  strcat(fullName,"/");                                 
                  strcat(fullName, h.name);
+                 fullName[HD_NAME + HD_PREFIX] = '\0';
             }
             else{ 
                 strcpy(fullName, h.name);
+                fullName[HD_NAME] = '\0';
             }
             if (strcmp(h.typeflag, "5") == 0){       
                 fullName[strlen(fullName) - 1] = '\0';                          

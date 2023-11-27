@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <pwd.h>
 #include <grp.h>
+#include <time.h>
 
 #ifndef PATH_MAX
 #define PATH_MAX 256
